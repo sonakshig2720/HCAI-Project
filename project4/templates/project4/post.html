@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Post-Survey</h1>
+  <form method="post">
+    {% csrf_token %}
+    <label>Trust now (1–5): <input type="number" name="trust" min="1" max="5" required></label><br>
+    <label>Usefulness (1–5): <input type="number" name="usefulness" min="1" max="5" required></label><br>
+    <label>Effort (1–5, lower=better): <input type="number" name="effort" min="1" max="5" required></label><br><br>
+    <button type="submit">Finish</button>
+  </form>
+{% endblock %}

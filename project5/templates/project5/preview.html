@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<h2>Grid Preview</h2>
+
+<p>
+  <a href="{% url 'project5:preview' %}?seed={{ seed|add:'1' }}">Reshuffle</a>
+  ·
+  <a href="{% url 'project5:index' %}">Back</a>
+</p>
+
+<div class="gw">
+  {% for row in grid %}
+    {% for cell in row %}
+      <div class="tile {{ cell.cls }}">{{ cell.char }}</div>
+    {% endfor %}
+  {% endfor %}
+</div>
+
+<div class="legend">
+  <div><span class="leg tile tile-mouse">🐭</span> Mouse</div>
+  <div><span class="leg tile tile-cheese">🧀</span> Cheese</div>
+  <div><span class="leg tile tile-organic">🧀</span> Organic Cheese</div>
+  <div><span class="leg tile tile-trap">☠️</span> Trap</div>
+  <div><span class="leg tile tile-wall">🧱</span> Wall</div>
+  <div><span class="leg tile tile-empty"></span> Empty</div>
+</div>
+{% endblock %}

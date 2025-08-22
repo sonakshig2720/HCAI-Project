@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logistic Regression Results</title>
+</head>
+<body>
+    <h2>Logistic Regression with Feature Sparsity</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="lambda">Lambda (λ):</label>
+        <input type="range" name="lambda" id="lambda" min="0.0" max="1.0" step="0.05" value="{{ lambda }}">
+        <span>{{ lambda }}</span>
+        <br><button type="submit">Show</button>
+    </form>
+
+    {% if accuracy %}
+        <p>Accuracy: {{ accuracy }}%</p>
+        <p>Number of Features Used: {{ features_used }}</p>
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+    {% endif %}
+
+    <br><a href="{% url 'project3:index' %}">Back to Index</a>
+</body>
+</html>

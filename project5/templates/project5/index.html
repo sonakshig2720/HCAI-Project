@@ -1,0 +1,198 @@
+{% load static %}
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Project 5 — Tasks 1–3</title>
+    <link rel="stylesheet" href="{% static 'project5/styles.css' %}">
+    <style>
+      /* Grid + tiles */
+      .gw{display:grid;grid-template-columns:repeat(5,48px);grid-auto-rows:48px;gap:6px;margin:12px 0}
+      .tile{border:1px solid #ddd;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;user-select:none}
+      .tile-empty{background:#fafafa}
+      .tile-mouse{background:#dce9ff}
+      .tile-cheese{background:#fff6bf}
+      .tile-organic{background:#e8ffd9}
+      .tile-trap{background:#ffe0e0;border-color:#f8a6a6}
+      .tile-wall{background:#2a2a2a;color:#fff;border-color:#2a2a2a}
+
+      /* UI bits */
+      .legend{display:grid;grid-template-columns:repeat(3,minmax(140px,1fr));gap:8px 16px;margin-top:12px}
+      .legend .leg{width:28px;height:28px;font-size:16px;margin-right:8px;display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
+      .toolbar{display:flex;gap:12px;align-items:center;margin:6px 0 16px}
+      .btn{padding:8px 12px;border:1px solid #ddd;border-radius:8px;background:#fafafa;text-decoration:none;cursor:pointer;display:inline-block}
+      .btn[disabled]{opacity:.5;cursor:not-allowed}
+      .results{margin-top:12px;padding:12px;border:1px solid #e5e5e5;border-radius:10px;background:#fbfbfb}
+
+      /* Tiny bar chart */
+      .chart-card{margin-top:12px;padding:10px;border:1px solid #eee;border-radius:10px}
+      .chart-bars{display:flex;gap:16px;align-items:flex-end;height:140px;margin-top:8px}
+      .bar{width:28px;background:#cfe2ff;border:1px solid #9ec5fe;border-radius:6px;display:flex;align-items:flex-end;justify-content:center}
+      .bar-label{margin-top:6px;font-size:12px;text-align:center}
+      .bar-value{font-size:12px;color:#555;text-align:center}
+    </style>
+  </head>
+  <body>
+    <h1>Project 5 — Reinforcement Learning with Human Feedback</h1>
+
+    <div class="toolbar">
+      <a class="btn" href="{% url 'project5:reshuffle' %}">🔀 Reshuffle Grid</a>
+    </div>
+
+    <!-- Grid BEFORE training -->
+    <div class="gw">
+      {% for row in grid %}
+        {% for cell in row %}
+          <div class="tile {{ cell.cls }}">{{ cell.char }}</div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+
+    <div class="legend">
+      <div><span class="leg tile tile-mouse">🐭</span> Mouse</div>
+      <div><span class="leg tile tile-cheese">🧀</span> Cheese</div>
+      <div><span class="leg tile tile-organic">🧀</span> Organic</div>
+      <div><span class="leg tile tile-trap">☠️</span> Trap</div>
+      <div><span class="leg tile tile-wall">🧱</span> Wall</div>
+      <div><span class="leg tile tile-empty"></span> Empty</div>
+    </div>
+
+    <hr>
+
+    <!-- Task 1: Train -->
+    <h2>Task 1 — Train REINFORCE Policy</h2>
+    <form method="post" action="{% url 'project5:train' %}">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn" type="submit">Train</button>
+    </form>
+
+  {% if show_results %}
+  <div class="results">
+    <strong>Training complete.</strong>
+    <div>Mean episodic return (eval): {{ mean_return|floatformat:2 }}</div>
+    <div>Std episodic return (eval): {{ std_return|floatformat:2 }}</div>
+  </div>
+  {% endif %}
+
+  {% if chart_points %}
+  <div class="chart-card">
+    <strong>Performance chart</strong>
+    <div id="chart" class="chart-bars" data-absmax="{{ chart_absmax|default:1 }}">
+      {% for label, val in chart_points %}
+        <div class="bar" data-label="{{ label }}" data-value="{{ val }}"></div>
+      {% endfor %}
+    </div>
+    <div id="chart-labels" style="display:flex;gap:24px;margin-top:6px;">
+      {% for label, val in chart_points %}
+        <div style="width:100px;text-align:center">
+          <div class="bar-label" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            {{ label }}
+          </div>
+          <div class="bar-value">{{ val|floatformat:2 }}</div>
+        </div>
+      {% endfor %}
+    </div>
+    <div style="font-size:12px;color:#777;margin-top:4px;">
+      Bars scaled by max(|mean|) = {{ chart_absmax|floatformat:2 }}
+    </div>
+  </div>
+  {% endif %}
+
+  <script>
+    (function(){
+      var chart = document.getElementById('chart');
+      if(!chart) return;
+      var absmax = parseFloat(chart.getAttribute('data-absmax') || '1');
+      if(!(absmax > 0)) absmax = 1;
+
+      var bars = chart.querySelectorAll('.bar');
+      bars.forEach(function(bar){
+        var v = parseFloat(bar.getAttribute('data-value') || '0');
+        var h = Math.round(120 * Math.abs(v) / absmax);  // 120px visual range
+        bar.style.height = (h < 3 ? 3 : h) + 'px';
+        bar.style.width  = '36px';
+        bar.style.borderRadius = '6px';
+        bar.style.border = '1px solid ' + (v >= 0 ? '#9ec5fe' : '#f4a6a6');
+        bar.style.background   = (v >= 0 ? '#cfe2ff' : '#ffe0e0');
+        bar.style.marginRight  = '24px';
+      });
+    })();
+  </script>
+
+    <hr>
+
+    <!-- Task 2: Sample + Compare -->
+    <h2>Task 2 — Sample Trajectories & Give Preferences</h2>
+    {% if trained %}
+      <p>
+        <a class="btn" href="{% url 'project5:sample' %}">Sample trajectories</a>
+        {% if num_prefs %}<span style="margin-left:8px;">Preferences collected: {{ num_prefs }}</span>{% endif %}
+      </p>
+      <p style="font-size:12px;color:#666;margin-top:-6px;">After sampling, the compare UI opens at <code>/project5/compare/</code>.</p>
+    {% else %}
+      <p>Train the model first to enable trajectory sampling.</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- Task 3: Fit Reward + RLHF -->
+    <h2>Task 3 — Learn Reward & RLHF Fine‑Tune</h2>
+    {% if trained %}
+      <form method="post" action="{% url 'project5:fit_reward' %}" style="margin:8px 0;">
+        {% csrf_token %}
+        <button class="btn" type="submit" {% if num_prefs|default:0 < 1 %}disabled{% endif %}>
+          Fit reward from {{ num_prefs|default:0 }} preferences
+        </button>
+      </form>
+
+      <form method="post" action="{% url 'project5:rlhf_retrain' %}" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        {% csrf_token %}
+        <label>KL β <input name="kl_beta" type="number" step="0.001" value="0.01" style="width:80px"></label>
+        <label>Epochs <input name="epochs" type="number" value="50" style="width:80px"></label>
+        <label>LR <input name="lr" type="text" value="0.05" style="width:90px"></label>
+        <label>Max steps <input name="max_steps" type="number" value="50" style="width:90px"></label>
+        <button class="btn" type="submit" {% if not reward_fit %}disabled{% endif %}>RLHF fine‑tune</button>
+      </form>
+
+      <div class="results" style="margin-top:8px;">
+        <div>Reward fitted: {{ reward_fit }}</div>
+        <div>RLHF done: {{ rlhf_done }}</div>
+      </div>
+    {% else %}
+      <p>Train the model first to enable Task 3.</p>
+    {% endif %}
+
+    <hr>
+
+    <!-- Reset Session -->
+    <form method="post" action="{% url 'project5:reset' %}">
+      {% csrf_token %}
+      <button class="btn" type="submit" style="background:#fff3cd;border-color:#ffe69c;">Reset Session</button>
+    </form>
+
+    <!-- Bar chart script: scales bars based on data-* attributes -->
+    <script>
+      (function(){
+        var chart = document.getElementById('chart');
+        if(!chart) return;
+        var absmax = parseFloat(chart.getAttribute('data-absmax') || '1');
+        if(!(absmax > 0)) absmax = 1;
+        var bars = chart.querySelectorAll('.bar');
+        bars.forEach(function(bar){
+          var v = parseFloat(bar.getAttribute('data-value') || '0');
+          var h = Math.round(120 * Math.abs(v) / absmax); // 120px visual range
+          bar.style.height = (h < 2 ? 2 : h) + 'px';
+          // indicate sign via border color
+          if (v >= 0) {
+            bar.style.background = '#cfe2ff';
+            bar.style.borderColor = '#9ec5fe';
+          } else {
+            bar.style.background = '#ffe0e0';
+            bar.style.borderColor = '#f4a6a6';
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

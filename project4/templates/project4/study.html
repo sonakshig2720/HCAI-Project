@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<h1>Study</h1>
+
+<section class="recommendations">
+  <h2>Your Current Top‑5 Recommendations</h2>
+  {% if current_recs %}
+    <ol>
+      {% for title in current_recs %}
+        <li>{{ title }}</li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p>No recommendations yet. Rate a movie below to get started!</p>
+  {% endif %}
+</section>
+
+<section class="recommendations">
+  <h2>If You Rate “Loved It”</h2>
+  {% if predicted_recs %}
+    <ol>
+      {% for title in predicted_recs %}
+        <li>{{ title }}</li>
+      {% endfor %}
+    </ol>
+  {% endif %}
+</section>
+
+<section class="rating-form">
+  <h2>Rate this Movie</h2>
+  <p><strong>{{ next_movie_title }}</strong> (ID {{ next_movie_id }})</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="movie_id" value="{{ next_movie_id }}">
+    <label for="rating">Your rating (0.5–5.0):</label>
+    <input id="rating" name="rating" type="number" step="0.5" min="0.5" max="5" required>
+
+    <div class="btns">
+      <button type="submit" name="action" value="rate">Submit Rating</button>
+      <button type="submit" name="action" value="rate_and_analyze">Submit &amp; View</button>
+    </div>
+  </form>
+</section>
+
+<style>
+.recommendations {
+  background:#fff;border:1px solid #ddd;border-radius:8px;
+  padding:1rem;margin:1rem 0;
+}
+.recommendations h2{margin-top:0}
+.rating-form {
+  background:#fff;border:1px solid #ddd;border-radius:8px;
+  padding:1rem;max-width:480px
+}
+.rating-form input[type=number]{
+  width:100%;padding:.45rem;margin:.4rem 0 1rem;border:1px solid #ccc;border-radius:4px
+}
+.btns{display:flex;gap:.5rem}
+button{
+  background:#10b981;color:#fff;border:0;border-radius:6px;
+  padding:.55rem 1rem;cursor:pointer
+}
+button:hover{background:#059669}
+</style>
+
+{% endblock %}

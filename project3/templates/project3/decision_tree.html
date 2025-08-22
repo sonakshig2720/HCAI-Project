@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Decision Tree Results</title>
+</head>
+<body>
+    <h2>Decision Tree Classifier</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="depth">Max Depth:</label>
+        <input type="number" name="depth" id="depth" min="1" max="20" required value="{{ depth }}">
+        <button type="submit">Show</button>
+    </form>
+
+    {% if accuracy %}
+        <p>Accuracy: {{ accuracy }}%</p>
+        <p>Number of Leaves: {{ leaves }}</p>
+        <p>Maximum Depth given: {{depth}}</p>
+        <img src="data:image/png;base64,{{ tree_image }}" alt="Decision Tree">
+    {% endif %}
+
+    <br><a href="{% url 'project3:index' %}">Back to Index</a>
+</body>
+</html>

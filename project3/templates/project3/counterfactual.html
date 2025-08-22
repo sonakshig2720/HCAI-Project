@@ -1,0 +1,59 @@
+<h2>Counterfactual Explanation</h2>
+
+<form method="post">
+    {% csrf_token %}
+    <label for="instance">Select an Instance:</label>
+    <select name="instance" id="instance">
+        {% for idx, val in instance_options %}
+            <option value="{{ idx }}" {% if selected_instance == idx %}selected{% endif %}>Instance {{ val }}</option>
+        {% endfor %}
+    </select>
+
+    <br><label for="target">Target Class:</label>
+    <select name="target" id="target">
+        {% for idx, label in label_options %}
+            <option value="{{ idx }}" {% if selected_label == idx %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <br><label for="k">How many counterfactuals (k)?</label>
+    <input type="number" name="k" id="k" min="1" max="20" value="{{ k }}">
+
+
+    <br><button type="submit">Show Counterfactuals</button>
+</form>
+
+{% if prediction %}
+    <p><strong>Instance Number:</strong> {{ instance_number }}</p>
+    <p><strong>Original Prediction:</strong> {{ prediction }}</p>
+    <p><strong>Target Label:</strong> {{ target }}</p>
+
+    <h3>Original Input:</h3>
+    <ul>
+        {% for key, value in original.items %}
+            <li>{{ key }}: {{ value }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Top Counterfactuals:</h3>
+    {% if counterfactuals %}
+        <table border="1">
+            <tr>
+                {% for key in counterfactuals.0.keys %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in counterfactuals %}
+            <tr>
+                {% for value in row.values %}
+                    <td>{{ value }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No valid counterfactuals found.</p>
+    {% endif %}
+{% endif %}
+
+<br><a href="{% url 'project3:index' %}">Back to Index</a>

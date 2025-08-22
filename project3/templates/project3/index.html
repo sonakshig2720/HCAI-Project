@@ -1,0 +1,15 @@
+<!-- templates/project3/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project 3: Explainability</title>
+</head>
+<body>
+    <h1>Project 3: Explainability</h1>
+    <ul>
+        {% for link in links %}
+            <li><a href="{% url link.url %}">{{ link.name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

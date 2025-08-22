@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Debrief</h1>
+  <p>Thanks for participating! Your anonymous id: <code>{{ pid }}</code></p>
+  <p>You were randomly assigned to a condition (guided vs control). Data is stored anonymously for analysis.</p>
+  <p><a href="{% url 'project4:index' %}">Back to Project 4</a></p>
+{% endblock %}

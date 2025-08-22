@@ -1,0 +1,39 @@
+/* 5x5 grid layout */
+.gw {
+  display: grid;
+  grid-template-columns: repeat(5, 48px);
+  grid-auto-rows: 48px;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.tile {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  user-select: none;
+}
+
+/* Colors per type */
+.tile-empty   { background: #fafafa; }
+.tile-mouse   { background: #dce9ff; }
+.tile-cheese  { background: #fff6bf; }
+.tile-organic { background: #e8ffd9; }
+.tile-trap    { background: #ffe0e0; border-color: #f8a6a6; }
+.tile-wall    { background: #2a2a2a; color: #fff; border-color: #2a2a2a; }
+
+/* Legend */
+.legend {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  gap: 8px 16px;
+  margin-top: 12px;
+}
+.legend .leg {
+  width: 28px; height: 28px; font-size: 16px; margin-right: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  vertical-align: middle;
+}

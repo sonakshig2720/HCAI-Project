@@ -1,0 +1,121 @@
+/* ====== Background ====== */
+html, body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  background: url("../images/bg.jpeg") center / cover no-repeat fixed !important;
+  font-family: 'Poppins', sans-serif;
+  color: #222;
+  position: relative;
+  text-align: center;
+}
+
+/* Overlay for readability */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.12);
+  pointer-events: none;
+  z-index: 0;
+}
+body > * { position: relative; z-index: 1; }
+
+/* ====== Center EVERYTHING ====== */
+.grid-parent {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;      /* horizontal center */
+  justify-content: center;  /* vertical center */
+  gap: 22px;
+}
+
+/* ====== Typography ====== */
+h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 2.3rem;    /* bigger title */
+  color: #111;
+  margin-bottom: 0.4em;
+}
+
+
+p {
+  font-size: 1.25rem;   /* increase body text size */
+  line-height: 1.7;
+  color: #333;
+  max-width: 900px;
+  margin: 0.5rem auto 1.5rem;
+}
+
+h2, h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 2rem;      /* larger section headings */
+  margin: 0.8em 0 0.4em;
+  color: #111;
+}
+
+/* ====== Buttons ====== */
+button, .btn, a.btn {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 14px 28px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.15);
+  background: #1f2937;
+  color: #fff;
+  display: block;
+  min-width: 260px;
+  margin: 10px auto;
+  text-decoration: none;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+  box-shadow: 0 6px 14px rgba(0,0,0,.25);
+}
+button:hover, .btn:hover, a.btn:hover {
+  background: #111827;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0,0,0,.32);
+}
+
+/* ====== Table ====== */
+table {
+  margin: 12px auto;
+  border-collapse: collapse;
+  background: rgba(255,255,255,.9);
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 1.5rem; 
+}
+td, th {
+  padding: 12px 18px;
+  color: #222;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+  font-size: 1.5rem;       /* increase font size */
+  font-weight: 500;        /* make it a bit bolder */
+  text-align: center;      /* centers contents */
+}
+td:nth-child(1) {
+  text-align: left;   /* names */
+}
+td:nth-child(2) {
+  text-align: center;
+  width: 50px;           /* fixed width so dash stays in one spot */
+  font-weight: 600;      /* make it more visible */
+  display: table-cell;
+  vertical-align: middle; /* ensures vertical centering */
+}
+td:nth-child(3) {
+  text-align: right;  /* IDs */
+}
+
+.main-title {
+  font-size: 2.7rem;
+  font-weight: 800;
+  color: #111;
+  margin-bottom: 0.8em;
+}

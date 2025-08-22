@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  body {
+    background: #4a72b2 !important; /* match consent page */
+    color: #111;
+  }
+
+  .pre-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  h1 {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-weight: 600;
+    display: block;
+    margin: 15px 0 5px;
+  }
+
+  input[type="number"] {
+    width: 100px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+  }
+
+  .explain {
+    font-size: 0.9rem;
+    color: #222;   /* readable on blue */
+    margin-bottom: 10px;
+  }
+
+  button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 20px;
+    display: block;
+  }
+  button:hover {
+    background: #1e40af;
+  }
+</style>
+
+<div class="pre-container">
+  <h1>Pre-Survey</h1>
+
+  <form method="post">
+    {% csrf_token %}
+
+    <label for="trust">Initial trust (1–5):</label>
+    <input id="trust" name="trust" type="number" min="1" max="5" required>
+    <p class="explain">
+      How much you would trust this recommender system right now
+      (1 = not at all, 5 = fully).
+    </p>
+
+    <label for="usefulness">Expected usefulness (1–5):</label>
+    <input id="usefulness" name="usefulness" type="number" min="1" max="5" required>
+    <p class="explain">
+      How helpful you expect the system’s recommendations will be
+      (1 = not useful, 5 = very useful).
+    </p>
+
+    <label for="expertise">Familiarity with recommenders (1–5):</label>
+    <input id="expertise" name="expertise" type="number" min="1" max="5" required>
+    <p class="explain">
+      How familiar you are with recommendation systems (like Netflix, Amazon, Spotify)
+      (1 = not familiar, 5 = very familiar).
+    </p>
+
+    <button type="submit">Continue →</button>
+  </form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<head>
+    <title>Project 1: Automated Machine Learning</title>
+</head>
+
+
+<h1>Upload CSV File</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="file" name="csv_file" accept=".csv" required>
+    <button type="submit">Upload</button>
+</form>
+
+{% if data_preview %}
+    <h2>Dataset Preview</h2>
+    <div>{{ data_preview|safe }}</div>
+{% endif %}
+
+{% if show_visualize or show_train_form %}
+    <hr>
+    <h2>Select Task and Target Column</h2>
+    <form method="post">
+        {% csrf_token %}
+        <label for="target_column">Target Column:</label>
+        <select name="target_column" required>
+            {% for col in columns %}
+                <option value="{{ col }}" {% if col == target_column %}selected{% endif %}>{{ col }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="task">Problem Type:</label>
+        <select name="task" id="task-select" required>
+            <option value="classification" {% if task == "classification" %}selected{% endif %}>Classification</option>
+            <option value="regression" {% if task == "regression" %}selected{% endif %}>Regression</option>
+        </select><br><br>
+
+        <label for="x_feature">X Feature:</label>
+        <select name="x_feature" required>
+            {% for col in columns %}
+                <option value="{{ col }}" {% if col == x_feature %}selected{% endif %}>{{ col }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <label for="y_feature">Y Feature (optional for regression, required for classification):</label>
+        <select name="y_feature">
+            <option value="">-- Optional --</option>
+            {% for col in columns %}
+                <option value="{{ col }}" {% if col == y_feature %}selected{% endif %}>{{ col }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <button type="submit" name="visualize">Visualize</button>
+    </form>
+
+{% endif %}
+
+
+{% if plot_url %}
+    <h2>Generated Plot:</h2>
+    <img src="{{ plot_url }}" alt="Generated plot" style="max-width: 600px; border: 1px solid #ccc;">
+{% endif %}
+
+{% if show_train_form %}
+    <hr>
+    <h2>Train a Model</h2>
+    <form method="post">
+        {% csrf_token %}
+
+        <input type="hidden" name="target_column" value="{{ request.POST.target_column|default:'' }}">
+
+        <label for="task">Problem Type:</label>
+        <select name="task" id="task-select" required onchange="updateModels()">
+            <option value="classification">Classification</option>
+            <option value="regression">Regression</option>
+        </select><br><br>
+
+        <label for="model_type">Choose Model:</label>
+        <select name="model_type" id="model-select" required></select><br><br>
+
+        <button type="submit" name="train">Train Model</button>
+    </form>
+
+    <script>
+        const modelSelect = document.getElementById("model-select");
+        const taskSelect = document.getElementById("task-select");
+
+        const modelOptions = {
+            classification: [
+                { value: "logistic", text: "Logistic Regression" },
+                { value: "dt", text: "Decision Tree" },
+                { value: "rf", text: "Random Forest" },
+                { value: "knn", text: "K-Nearest Neighbors" },
+                { value: "svm", text: "Support Vector Machine" },
+                { value: "nb", text: "Naive Bayes" }
+            ],
+            regression: [
+                { value: "lasso", text: "Lasso Regression" },
+                { value: "ridge", text: "Ridge Regression" },
+                { value: "xgb", text: "XGBoost Regressor" },
+                { value: "lgbm", text: "LightGBM Regressor" }
+            ]
+        };
+
+        function updateModels() {
+            const task = taskSelect.value;
+            modelSelect.innerHTML = "";
+            modelOptions[task].forEach(model => {
+                const option = document.createElement("option");
+                option.value = model.value;
+                option.text = model.text;
+                modelSelect.appendChild(option);
+            });
+        }
+
+        updateModels();
+    </script>
+{% endif %}
+
+{% if model_label %}z
+    <h3 style="margin-top: 20px;">Model Info:</h3>
+    <p><strong>The model being implemented is:</strong> {{ model_label }}</p>
+{% endif %}
+
+
+{% if evaluation_result %}
+    <h3>Model Evaluation Result:</h3>
+
+    {% if task == "classification" %}
+        <p><strong>Accuracy:</strong> {{ evaluation_result.accuracy }}</p>
+        <p><strong>Precision:</strong> {{ evaluation_result.precision }}</p>
+        <p><strong>Recall:</strong> {{ evaluation_result.recall }}</p>
+        <p><strong>F1-Score:</strong> {{ evaluation_result.f1_score }}</p>
+    {% elif task == "regression" %}
+        <p><strong>Mean Absolute Error:</strong> {{ evaluation_result.mae }}</p>
+        <p><strong>Mean Squared Error:</strong> {{ evaluation_result.mse }}</p>
+        <p><strong>Root Mean Squared Error:</strong> {{ evaluation_result.rmse }}</p>
+        <p><strong>R² Score:</strong> {{ evaluation_result.r2 }}</p>
+    {% endif %}
+{% endif %}
+
+
+{% endblock %}

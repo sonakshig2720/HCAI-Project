@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h1>Consent</h1>
+  <p>Purpose: evaluate guided active learning for cold-start recommendation.</p>
+  <p>We store anonymous data (ratings, timings, condition). You can withdraw any time.</p>
+  <form method="post">
+    {% csrf_token %}
+    <label><input type="checkbox" name="agree" required> I consent to participate.</label>
+    <br><br>
+    <button type="submit">Continue</button>
+  </form>
+{% endblock %}

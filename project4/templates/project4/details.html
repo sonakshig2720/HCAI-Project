@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Recommendation Details</h1>
+
+<section class="detail-card">
+  <h3>Confidence</h3>
+  <p><strong>{{ confidence }}%</strong></p>
+  <p>This is how far the predicted rating is from neutral (3.0) for <em>{{ next_movie_title }}</em>.</p>
+</section>
+
+<section class="detail-card">
+  <h3>Genre Hint</h3>
+  <p><strong>{{ key_genre }}</strong></p>
+  <p>Dominant genre for the current query; a quick cue to the taste dimension.</p>
+</section>
+
+<section class="detail-card">
+  <h3>Impact Preview</h3>
+  {% if guidance_pairs %}
+    <ul class="impact-list">
+      {% for pair in guidance_pairs %}
+        <li>
+          <span class="label">Before:</span> {{ pair.before }}<br>
+          <span class="label">After:</span> {{ pair.after }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No preview yet.</p>
+  {% endif %}
+  <p class="note">“After” assumes you love the movie and rate it 5.0.</p>
+</section>
+
+<section class="detail-card">
+  <h3>Information Gain</h3>
+  <p><strong>{{ info_gain }}</strong></p>
+  <p>Magnitude of change in your latent profile if you love the current movie.</p>
+</section>
+
+<p class="nav">
+  <a href="{% url 'project4:study' %}">← Back to Study</a> |
+  <a href="{% url 'project4:index' %}">Project 4</a> |
+  <a href="{% url 'home:index' %}">Home</a>
+</p>
+
+<style>
+.detail-card{
+  background:#fff;border:1px solid #ddd;border-radius:8px;
+  padding:1rem;margin:1rem 0
+}
+.impact-list{margin:.4rem 0 0 1rem}
+.label{color:#555;font-size:.9rem}
+.note{color:#555;font-size:.9rem;margin-top:.35rem}
+.nav a{color:#2563eb;text-decoration:none;margin-right:.4rem}
+.nav a:hover{text-decoration:underline}
+</style>
+
+{% endblock %}

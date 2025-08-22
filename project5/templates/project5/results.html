@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Training Results</h2>
+<ul>
+  <li>Trained: {{ info.trained }}</li>
+  <li>Mean episodic return (eval): {{ info.mean_return }}</li>
+  <li>Std episodic return (eval): {{ info.std_return }}</li>
+</ul>
+<p><a href="{% url 'project5:index' %}">Back</a></p>
+{% endblock %}
