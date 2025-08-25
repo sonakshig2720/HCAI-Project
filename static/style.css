@@ -24,13 +24,18 @@ body::before {
 body > * { position: relative; z-index: 1; }
 
 /* ====== Center EVERYTHING ====== */
+/* ====== Center EVERYTHING ====== */
 .grid-parent {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;      /* horizontal center */
-  justify-content: center;  /* vertical center */
+  align-items: center;      /* center horizontally */
+  justify-content: center;  /* center vertically */
   gap: 22px;
+  width: 100%;              /* take full width */
+  text-align: center;       /* center text inside */
+  box-sizing: border-box;
+  padding: 0 20px;          /* keep some side padding */
 }
 
 /* ====== Typography ====== */
@@ -43,13 +48,17 @@ h1 {
 }
 
 
+/* ====== Paragraphs ====== */
 p {
-  font-size: 1.25rem;   /* increase body text size */
+  font-size: 1.25rem;
   line-height: 1.7;
   color: #333;
-  max-width: 900px;
-  margin: 0.5rem auto 1.5rem;
+  width: 100%;              /* stretch full width */
+  max-width: none;          /* remove 900px cap */
+  margin: 0.5rem 0 1.5rem;  /* vertical spacing */
+  text-align: center;       /* keep text centered */
 }
+
 
 h2, h3 {
   font-family: 'Montserrat', sans-serif;
@@ -119,3 +128,4 @@ td:nth-child(3) {
   color: #111;
   margin-bottom: 0.8em;
 }
+
