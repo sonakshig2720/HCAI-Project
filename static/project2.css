@@ -1,0 +1,213 @@
+/* Scope everything to this page */
+.project2 {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  text-align: center;                 /* center all text by default */
+}
+
+/* Title & section headings */
+.project2 h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 2.3rem;
+  color: #111;
+  margin-bottom: 0.1em;
+}
+.project2 h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #111;
+  margin: 1.2em 0 .4em;
+}
+
+/* Paragraphs */
+.project2 p.lead {
+  font-size: 1.15rem;
+  line-height: 1.75;
+  color: #444;
+  margin: .4rem auto 1rem;
+  width: 100%;
+}
+.project2 p.meta {
+  font-size: 1.05rem;
+  color: #4a4a4a;
+  margin: 0 auto 1.2rem;
+}
+.project2 p.meta strong { color: #1a1a1a; }
+
+/* Inline code tokens */
+.project2 code{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: .95em;
+  padding: 0 .35em;
+  border-radius: 6px;
+  background: rgba(0,0,0,.08);
+}
+
+/* Task sections */
+.project2 .task{ margin: 40px auto; }
+
+/* Buttons (inherit your global .btn, just tweak spacing) */
+.project2 .btn{ margin-top: 10px; min-width: 200px; }
+.project2 .btn-primary{ background:#1f2937; color:#fff; border:1px solid rgba(0,0,0,.15); }
+.project2 .btn-primary:hover{ background:#111827; }
+
+
+/* ===== Centered forms (labels + inputs + button) ===== */
+.project2 .controls,
+.project2 form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;           /* center the items */
+  gap: 3px;
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  text-align: center;            /* center label text */
+}
+
+/* label above input */
+.project2 .controls label,
+.project2 form label{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  font-size: 1.15rem;
+  color: #333;
+}
+
+/* Consistent input width */
+.project2 .controls input[type="number"],
+.project2 .controls input[type="text"],
+.project2 .controls select,
+.project2 form input[type="number"],
+.project2 form input[type="text"],
+.project2 form select{
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.18);
+  background: rgba(255,255,255,.9);
+  color: #111;
+  width: 280px;                 /* same width for all controls */
+  max-width: 100%;
+  margin: 0;
+  text-align: center;           /* center text inside the input */
+  box-shadow: 0 4px 10px rgba(0,0,0,.10);
+}
+
+.project2 .controls input:focus,
+.project2 .controls select:focus,
+.project2 form input:focus,
+.project2 form select:focus{
+  outline: none;
+  border-color: #1f2937;
+  box-shadow: 0 0 0 3px rgba(31,41,55,.18);
+}
+
+/* Form buttons centered */
+.project2 .controls button,
+.project2 .controls .btn,
+.project2 form button,
+.project2 form .btn{
+  display: block;
+  margin: 8px auto 0;
+}
+
+/* Chart area placeholder */
+#learning-curve{
+  width: min(950px, 92vw);
+  height: 360px;
+  margin: 18px auto 0;
+  border-radius: 14px;
+  background: rgba(255,255,255,.75);
+  box-shadow: 0 8px 20px rgba(0,0,0,.15);
+}
+
+/* Home button (top-left) */
+.project2 .home-button{
+  position: fixed;
+  top: 18px; left: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 10px 18px;
+  background: #1f2937;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: background .2s ease, transform .15s ease;
+  z-index: 1000;
+}
+.project2 .home-button:hover{ background:#111827; transform: translateY(-2px); }
+
+/* Subtitle under page title */
+.project2 .desc{
+  width: 100%;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #292929;
+  margin-top: -0.3rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+/* Optional: soften or hide the <hr> divider between tasks */
+/* .project2 hr { display:none; } */
+/* or */
+.project2 hr{
+  border: none;
+  border-top: 1px solid rgba(0,0,0,0.12);
+  width: 60%;
+  margin: 24px auto;
+}
+
+/* Learning Curve Card */
+.project2 .learning-curve-container {
+  display: flex;
+  justify-content: center;
+  margin: 24px auto 40px;
+}
+
+.project2 .learning-curve-container img {
+  max-width: 95%;               /* almost full width */
+  height: auto;
+  border-radius: 16px;          /* same rounding as inputs/buttons */
+  background: rgba(255,255,255,0.85); /* soft translucent background */
+  padding: 20px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.25); /* same depth as buttons */
+  transition: transform 0.25s ease;
+}
+
+/* Small hover effect to match interactive feel */
+.project2 .learning-curve-container img:hover {
+  transform: scale(1.02);
+}
+
+/* Summary metrics layout */
+.project2 .metrics{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 18px;
+  margin: 16px auto;
+  max-width: 900px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #222;
+}
+.project2 .metrics strong{
+  font-size: 1.25rem;
+  color: #000;
+}
+
+
+

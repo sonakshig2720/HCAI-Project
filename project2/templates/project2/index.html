@@ -1,7 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'project2.css' %}">
+{% endblock %}
+
 {% block content %}
+<div class="project2">
+  
+  <a href="{% url 'home:index' %}" class="home-button">Home</a>
 
   {% if error %}
     <div style="padding:10px;border:1px solid #d33;background:#fee;color:#900;margin-bottom:1rem;">
@@ -13,22 +20,25 @@
       {{ message }}
     </div>
   {% endif %}
-
+  
+  
   <h1>Project 2: Text Classification & Active Learning</h1>
+  <p class="desc">
+    This project builds a text classifier on <bold>IMDB</bold> reviews and enhances its performance through active learning, in which the model queries new labels using different strategies.
+  </p>
 
   <!-- ========= TASK 1: PASSIVE TRAINING ========= -->
   <section>
-    <h2>Task 1: Passive Text Classification</h2>
+    <h2>Passive Text Classification</h2>
     <p>
       We train on 70% of the IMDB reviews (in <code>project2/data/imdb.csv(.gz)</code>)
       and test on the remaining 30%.<br/>
-      <strong>Representation:</strong> TF‑IDF (unigrams &amp; bigrams, top 20,000 features)<br/>
+      <strong>Representation:</strong> TF-IDF (unigrams &amp; bigrams, top 20,000 features)<br/>
       <strong>Classifier:</strong> Logistic Regression
     </p>
 
     <form method="post">
       {% csrf_token %}
-      <!-- keep this so older view versions still trigger the train branch -->
       <input type="hidden" name="train_submit" value="1">
       <button type="submit">Train / Retrain Model</button>
     </form>
@@ -38,11 +48,11 @@
     {% endif %}
   </section>
 
-  <hr/>
+  
 
   <!-- ======= TASK 2: POOL-BASED ACTIVE LEARNING ======= -->
   <section>
-    <h2>Task 2: Pool-based Active Learning</h2>
+    <h2>Pool-based Active Learning</h2>
     <p>
       Starting from a small labeled seed, we query new labels using different strategies.<br/>
       The learning curve (test accuracy vs. # of queries) will appear below.
@@ -93,8 +103,29 @@
     {% if active_curves %}
       <h3>Learning Curve</h3>
       <p>(Test accuracy vs. number of queries)</p>
-      <img src="{% static 'plots/al_curve.png' %}" alt="AL Learning Curve" style="max-width:700px;width:100%;height:auto;">
+      <div class="learning-curve-container">
+        <img src="{% static 'plots/al_curve.png' %}" alt="AL Learning Curve">
+      </div>
     {% endif %}
+
+    {% if final_accuracy %}
+      <div class="metrics">
+        <div><strong>Baseline accuracy:</strong> {{ baseline_accuracy|floatformat:4 }}</div>
+        <div><strong>Final accuracy:</strong> {{ final_accuracy|floatformat:4 }}</div>
+        <div><strong>Best accuracy:</strong> {{ best_accuracy|floatformat:4 }}</div>
+        <div><strong>ALC (avg. accuracy):</strong> {{ alc|floatformat:4 }}</div>
+        <div><strong>Relative improvement:</strong> {{ rel_improvement|floatformat:4 }}</div>
+        {% if stability %}
+          <div><strong>Stability (std):</strong> {{ stability|floatformat:4 }}</div>
+        {% endif %}
+        {% if queries_to_threshold %}
+          <div><strong>Queries to {{ threshold_target|floatformat:2 }} acc:</strong> {{ queries_to_threshold }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+
   </section>
 
+</div> <!-- /.project2 -->
 {% endblock %}

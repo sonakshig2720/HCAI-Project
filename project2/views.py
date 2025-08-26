@@ -115,6 +115,16 @@ def index(request):
     message        = None
     error          = None
 
+    # Task‑3 summary metrics
+    baseline_accuracy    = None
+    final_accuracy       = None
+    best_accuracy        = None
+    alc                  = None
+    rel_improvement      = None
+    stability            = None
+    queries_to_threshold = None   # number of labeled examples to hit a target
+    threshold_target     = 0.70   # you can change or expose as a form param
+
     # 1) Load dataset from gz (only)
     try:
         df = _load_imdb_gz()
@@ -126,6 +136,14 @@ def index(request):
             "active_curves": None,
             "active_form": {},
             "message": None,
+            "baseline_accuracy": None,
+            "final_accuracy": None,
+            "best_accuracy": None,
+            "alc": None,
+            "rel_improvement": None,
+            "stability": None,
+            "queries_to_threshold": None,
+            "threshold_target": threshold_target,
         })
 
     # 2) Branches
@@ -174,6 +192,31 @@ def index(request):
 
             active_curves = ys
 
+            # ---------- Task‑3 summary metrics ----------
+            if active_curves:
+                baseline_accuracy = float(active_curves[0])
+                final_accuracy    = float(active_curves[-1])
+                best_accuracy     = float(np.max(active_curves))
+
+                # ALC (normalized area under curve)
+                if len(xs) > 1:
+                    area = np.trapz(active_curves, x=xs)
+                    alc  = float(area / (xs[-1] - xs[0]))
+
+                # Relative improvement
+                rel_improvement = float(final_accuracy - baseline_accuracy)
+
+                # Stability (std dev of the curve)
+                if len(active_curves) > 1:
+                    stability = float(np.std(active_curves))
+
+                # Queries to reach a target accuracy (first x meeting threshold)
+                for x_val, acc in zip(xs, active_curves):
+                    if acc >= threshold_target:
+                        queries_to_threshold = int(x_val)
+                        break
+            # -------------------------------------------
+
             if xs and active_curves:
                 os.makedirs(PLOT_DIR, exist_ok=True)
                 plt.figure(figsize=(6.2, 4.3))
@@ -217,4 +260,14 @@ def index(request):
         "active_form": active_form,
         "message": message,
         "error": error,
+
+        # Task‑3 metrics
+        "baseline_accuracy": baseline_accuracy,
+        "final_accuracy": final_accuracy,
+        "best_accuracy": best_accuracy,
+        "alc": alc,
+        "rel_improvement": rel_improvement,
+        "stability": stability,
+        "queries_to_threshold": queries_to_threshold,
+        "threshold_target": threshold_target,
     })
