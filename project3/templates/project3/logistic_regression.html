@@ -1,9 +1,83 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Logistic Regression Results</title>
+    <style>
+      body {
+        background-image: url("{% static 'images/bg.jpeg' %}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+        text-align: center;
+      }
+
+      h2 {
+        margin-top: 20px;
+        font-size: 28px;
+        text-align: center;
+      }
+
+      form {
+        margin: 20px auto;
+        text-align: center;
+      }
+
+      label {
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      input[type="range"] {
+        width: 300px;
+        margin: 10px 0;
+      }
+
+      button {
+        padding: 6px 12px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      p {
+        font-size: 16px;
+        margin: 8px 0;
+        text-align: center;
+      }
+
+      a {
+        display: inline-block;
+        margin-top: 20px;
+        text-decoration: none;
+        font-weight: bold;
+        color: #333;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
 </head>
 <body>
+  <div class="page-container">
     <h2>Logistic Regression with Feature Sparsity</h2>
 
     <form method="post">
@@ -23,5 +97,6 @@
     {% endif %}
 
     <br><a href="{% url 'project3:index' %}">Back to Index</a>
+  </div>
 </body>
 </html>

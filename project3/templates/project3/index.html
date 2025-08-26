@@ -1,15 +1,72 @@
-<!-- templates/project3/index.html -->
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Project 3: Explainability</title>
+    <style>
+      body {
+        background-image: url("{% static 'images/bg.jpeg' %}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        font-family: Arial, sans-serif;
+        margin: 0;
+      }
+
+      .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;   /* consistent spacing like Project 1 */
+      }
+
+      .section-title {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      .lead {
+        text-align: center;
+        max-width: 700px;
+        margin: 10px auto 30px;
+        font-size: 16px;
+        color: #444;
+      }
+
+      .nav-list {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+        text-align: center;
+      }
+      .nav-list li {
+        margin: 8px 0;
+      }
+      .nav-list a {
+        text-decoration: none;
+        font-weight: bold;
+        color: #333;
+      }
+      .nav-list a:hover {
+        text-decoration: underline;
+      }
+    </style>
 </head>
 <body>
-    <h1>Project 3: Explainability</h1>
-    <ul>
-        {% for link in links %}
-            <li><a href="{% url link.url %}">{{ link.name }}</a></li>
-        {% endfor %}
+  <div class="page-container">
+    <h1 class="section-title">Project 3: Explainability</h1>
+
+    <p class="lead">
+      Explore human-centric AI explainability on the Palmer Penguins dataset:
+      fit interpretable models (decision trees, logistic regression), adjust sparsity/complexity,
+      and generate counterfactual examples that flip predictions.
+    </p>
+
+    <ul class="nav-list">
+      {% for link in links %}
+        <li><a href="{% url link.url %}">{{ link.name }}</a></li>
+      {% endfor %}
     </ul>
+  </div>
 </body>
 </html>

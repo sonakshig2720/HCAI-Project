@@ -1,9 +1,33 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Decision Tree Results</title>
+    <style>
+      body {
+        background-image: url("{% static 'images/bg.jpeg' %}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
+      .page-container { max-width: 1200px; margin: 0 auto; padding: 0 40px; text-align: center; }
+      h2 { margin-top: 20px; font-size: 28px; text-align: center; }
+      form { margin: 20px auto; text-align: center; }
+      label { font-weight: bold; margin-right: 10px; }
+      input[type="number"] { padding: 6px; width: 80px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+      button { padding: 6px 12px; margin-left: 10px; border: none; border-radius: 4px; background-color: #4CAF50; color: white; font-size: 14px; cursor: pointer; }
+      button:hover { background-color: #45a049; }
+      p { font-size: 16px; margin: 8px 0; text-align: center; }
+      img { display: block; margin: 20px auto; max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 6px; background: #fff; padding: 6px; }
+      a { display: inline-block; margin-top: 20px; text-decoration: none; font-weight: bold; color: #333; }
+      a:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
+  <div class="page-container">
     <h2>Decision Tree Classifier</h2>
 
     <form method="post">
@@ -21,5 +45,6 @@
     {% endif %}
 
     <br><a href="{% url 'project3:index' %}">Back to Index</a>
+  </div>
 </body>
 </html>

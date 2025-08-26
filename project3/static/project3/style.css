@@ -1,0 +1,43 @@
+/* Reset + background */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+
+  background-image: url("/static/images/bg.jpeg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  /* Centering */
+  display: flex;
+  justify-content: center;  /* horizontal */
+  align-items: center;      /* vertical */
+}
+
+/* Page container box */
+.page-container {
+  text-align: center;
+  max-width: 800px;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.85); /* makes text readable */
+  border-radius: 12px;
+}
+
+/* Tidy list */
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+}
+.nav-list li {
+  margin: 0.5rem 0;
+}
+.nav-list a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+.nav-list a:hover {
+  text-decoration: underline;
+}

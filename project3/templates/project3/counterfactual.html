@@ -1,59 +1,176 @@
-<h2>Counterfactual Explanation</h2>
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Counterfactual Explanation</title>
+    <style>
+      body {
+        background-image: url("{% static 'images/bg.jpeg' %}");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+      }
 
-<form method="post">
-    {% csrf_token %}
-    <label for="instance">Select an Instance:</label>
-    <select name="instance" id="instance">
-        {% for idx, val in instance_options %}
-            <option value="{{ idx }}" {% if selected_instance == idx %}selected{% endif %}>Instance {{ val }}</option>
-        {% endfor %}
-    </select>
+      .page-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 40px;
+        text-align: center;
+      }
 
-    <br><label for="target">Target Class:</label>
-    <select name="target" id="target">
-        {% for idx, label in label_options %}
-            <option value="{{ idx }}" {% if selected_label == idx %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-    </select>
+      h2 {
+        margin-top: 20px;
+        font-size: 28px;
+        text-align: center;
+      }
 
-    <br><label for="k">How many counterfactuals (k)?</label>
-    <input type="number" name="k" id="k" min="1" max="20" value="{{ k }}">
+      form {
+        margin: 20px auto;
+        text-align: center;
+      }
 
+      label {
+        font-weight: bold;
+        margin-right: 10px;
+      }
 
-    <br><button type="submit">Show Counterfactuals</button>
-</form>
+      input[type="number"],
+      select {
+        padding: 6px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 14px;
+        margin: 6px 0;
+      }
 
-{% if prediction %}
-    <p><strong>Instance Number:</strong> {{ instance_number }}</p>
-    <p><strong>Original Prediction:</strong> {{ prediction }}</p>
-    <p><strong>Target Label:</strong> {{ target }}</p>
+      button {
+        padding: 6px 12px;
+        margin-top: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #4CAF50;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+      }
 
-    <h3>Original Input:</h3>
-    <ul>
-        {% for key, value in original.items %}
-            <li>{{ key }}: {{ value }}</li>
-        {% endfor %}
-    </ul>
+      button:hover {
+        background-color: #45a049;
+      }
 
-    <h3>Top Counterfactuals:</h3>
-    {% if counterfactuals %}
-        <table border="1">
-            <tr>
-                {% for key in counterfactuals.0.keys %}
-                    <th>{{ key }}</th>
-                {% endfor %}
-            </tr>
-            {% for row in counterfactuals %}
-            <tr>
-                {% for value in row.values %}
-                    <td>{{ value }}</td>
-                {% endfor %}
-            </tr>
+      p {
+        font-size: 16px;
+        margin: 8px 0;
+        text-align: center;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        text-align: center;
+        margin: 10px 0;
+      }
+
+      ul li {
+        margin: 4px 0;
+      }
+
+      table {
+        border-collapse: collapse;
+        margin: 20px auto;
+        width: auto;
+        max-width: 100%;
+        background: #fff;
+      }
+
+      th, td {
+        border: 1px solid #ccc;
+        padding: 6px 10px;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      a {
+        display: inline-block;
+        margin-top: 20px;
+        text-decoration: none;
+        font-weight: bold;
+        color: #333;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+</head>
+<body>
+  <div class="page-container">
+    <h2>Counterfactual Explanation</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="instance">Select an Instance:</label>
+        <select name="instance" id="instance">
+            {% for idx, val in instance_options %}
+                <option value="{{ idx }}" {% if selected_instance == idx %}selected{% endif %}>Instance {{ val }}</option>
             {% endfor %}
-        </table>
-    {% else %}
-        <p>No valid counterfactuals found.</p>
-    {% endif %}
-{% endif %}
+        </select>
 
-<br><a href="{% url 'project3:index' %}">Back to Index</a>
+        <br><label for="target">Target Class:</label>
+        <select name="target" id="target">
+            {% for idx, label in label_options %}
+                <option value="{{ idx }}" {% if selected_label == idx %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+
+        <br><label for="k">How many counterfactuals (k)?</label>
+        <input type="number" name="k" id="k" min="1" max="20" value="{{ k }}">
+
+        <br><button type="submit">Show Counterfactuals</button>
+    </form>
+
+    {% if prediction %}
+        <p><strong>Instance Number:</strong> {{ instance_number }}</p>
+        <p><strong>Original Prediction:</strong> {{ prediction }}</p>
+        <p><strong>Target Label:</strong> {{ target }}</p>
+
+        <h3>Original Input:</h3>
+        <ul>
+            {% for key, value in original.items %}
+                <li>{{ key }}: {{ value }}</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Top Counterfactuals:</h3>
+        {% if counterfactuals %}
+            <table>
+                <tr>
+                    {% for key in counterfactuals.0.keys %}
+                        <th>{{ key }}</th>
+                    {% endfor %}
+                </tr>
+                {% for row in counterfactuals %}
+                <tr>
+                    {% for value in row.values %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>No valid counterfactuals found.</p>
+        {% endif %}
+    {% endif %}
+
+    <br><a href="{% url 'project3:index' %}">Back to Index</a>
+  </div>
+</body>
+</html>
