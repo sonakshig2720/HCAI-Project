@@ -1,7 +1,60 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'project4.css' %}?v=2">
+{% endblock %}
+
 {% block content %}
+<div class="project4">
+  <!-- Home button -->
+  <a href="{% url 'home:index' %}" class="home-button">Home</a>
+
+  <!-- Title + description -->
   <h1>Project 4: Guided Cold-Start Recommender</h1>
-  <p><a href="{% url 'project4:download_doc' %}">📄 Download Documentation (Tasks 1–3)</a></p>
-  <p><a href="{% url 'project4:consent' %}"><button>Start Study →</button></a></p>
-  <p><a href="{% url 'project4:details' %}">Get Detailed Information (demo)</a></p>
+  <p class="desc">
+    This project tackles the cold-start problem in recommender systems by using
+    <strong>guided active learning</strong>, where new users rate movies and
+    see how their feedback shapes future recommendations.
+  </p>
+
+  <!-- Documentation download -->
+  <h2>Download Documentation</h2>
+  <p>
+    By downloading the documentation, you can check:
+    <br>• Task 1: The method (guided active learning setup on MovieLens)<br>
+    • Task 2: The user-study design (hypotheses, setup, recruitment)<br>
+    • Task 3: Implementation details of the study interface
+  </p>
+  <p>
+    <a class="btn" href="{% url 'project4:download_doc' %}">
+      📄 Download Documentation (Tasks 1–3)
+    </a>
+  </p>
+
+  <!-- Start study -->
+  <h2>Participate in the Study</h2>
+  <p>
+    Start the study interface where you can rate movies, receive guidance,
+    and observe how your ratings affect recommendations.
+  </p>
+  <p>
+    <a class="btn" href="{% url 'project4:consent' %}">
+      Start Study →
+    </a>
+  </p>
+
+  <!-- Get detailed info -->
+  <h2>Detailed Demo</h2>
+  <p>
+    Check the <em>Detailed Information (demo)</em> page to preview how
+    guidance (confidence, genre hints, impact previews) is presented
+    during rating and how it influences recommendations.
+  </p>
+  <p>
+    <a class="btn" href="{% url 'project4:details' %}">
+      Get Detailed Information
+    </a>
+  </p>
+</div>
 {% endblock %}

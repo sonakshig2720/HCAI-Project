@@ -266,10 +266,17 @@ def download_doc(request):
 def consent(request):
     pid = _get_pid(request); cond = _get_condition(request); pilot = _is_pilot(request)
     if request.method == 'POST':
-        agreed = (request.POST.get('agree') == 'on')
-        _log_event({'event': 'consent', 'pid': pid, 'condition': cond, 'pilot': pilot, 'agreed': int(agreed)})
-        return redirect('project4:pre') if agreed else redirect('project4:consent')
+        # No checkbox, so just log agreement automatically
+        _log_event({
+            'event': 'consent',
+            'pid': pid,
+            'condition': cond,
+            'pilot': pilot,
+            'agreed': 1
+        })
+        return redirect('project4:pre')
     return render(request, 'project4/consent.html')
+
 
 def pre_survey(request):
     pid = _get_pid(request); cond = _get_condition(request); pilot = _is_pilot(request)

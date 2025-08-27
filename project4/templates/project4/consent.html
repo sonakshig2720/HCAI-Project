@@ -1,12 +1,41 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'project4.css' %}?v=9">
+{% endblock %}
+
 {% block content %}
-  <h1>Consent</h1>
-  <p>Purpose: evaluate guided active learning for cold-start recommendation.</p>
-  <p>We store anonymous data (ratings, timings, condition). You can withdraw any time.</p>
+
+<!-- Top navigation bar (Home left, Project 4 right) -->
+<div class="top-bar">
+  <a href="{% url 'home:index' %}" class="home-button">Home</a>
+  <a href="{% url 'project4:index' %}" class="proj4-button">Project 4</a>
+</div>
+
+<!-- Page content pushed below the bar -->
+<div class="page-with-topbar project4 consent">
+
+  <!-- Title always at very top of the content -->
+  <h1 class="page-title">Consent</h1>
+  <p class="desc">
+    Please read the following information carefully before continuing.
+  </p>
+
+  <ul class="key-list">
+    <li><strong>Time:</strong> About 4–5 minutes.</li>
+    <li><strong>Task:</strong> Rate some movies and see how your ratings affect recommendations.</li>
+    <li><strong>Data collected:</strong> Your ratings, basic interaction timings, and assigned study condition (guided or control). No personal information is stored.</li>
+  </ul>
+
+  <p class="consent-text"><strong>Risks &amp; benefits:</strong> Minimal risk, similar to browsing a website. While there is no direct benefit, your participation helps improve recommender systems.</p>
+  <p class="consent-text"><strong>Confidentiality:</strong> Data are stored anonymously. We do not collect your name, email, or contact details.</p>
+  <p class="consent-text"><strong>Voluntary:</strong> You may stop at any time by closing this page, with no penalty.</p>
+
   <form method="post">
     {% csrf_token %}
-    <label><input type="checkbox" name="agree" required> I consent to participate.</label>
-    <br><br>
-    <button type="submit">Continue</button>
+    <button type="submit" class="btn">I Agree &amp; Continue</button>
   </form>
+
+</div>
 {% endblock %}

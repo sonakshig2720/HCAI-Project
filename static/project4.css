@@ -1,0 +1,284 @@
+/* ===== Project 4 — match Project 2 look ===== */
+
+/* Page wrapper */
+.project4{
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  text-align: center;           /* center by default (like proj2) */
+}
+
+/* Titles */
+.project4 h1{
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 2.3rem;
+  color:#111;
+  margin-bottom: 0;             /* spacing handled by .desc below */
+}
+.project4 h2{
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 2rem;
+  color:#111;
+  margin: 1.2em 0 0;            /* spacing handled by first paragraph */
+}
+
+/* Normalize heading → paragraph spacing (same as proj2) */
+.project4 h1 + .desc{
+  margin-top: 0.6rem !important;
+  margin-bottom: 1rem !important;
+}
+.project4 h2 + p,
+.project4 h2 + .lead,
+.project4 h2 + .meta{
+  margin-top: 0.6rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Title description spacing */
+.project4 .desc {
+  width: 100%;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #292929;
+  line-height: 1.6;
+  margin-top: 1rem;      /* more space below title */
+  margin-bottom: 2rem;   /* more breathing room before next section */
+}
+
+/* Generic paragraphs used as section intros */
+.project4 p.lead,
+.project4 h2 + p{
+  font-size: 1.15rem;
+  line-height: 1.75;
+  color: #444;
+  width: 100%;
+}
+
+/* Inline code look */
+.project4 code{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: .95em;
+  padding: 0 .35em;
+  border-radius: 6px;
+  background: rgba(0,0,0,.08);
+}
+
+/* Buttons (match proj2, slightly smaller per your preference) */
+.project4 .btn,
+.project4 button[type="submit"]{
+  margin-top: 10px;
+  min-width: 200px;
+  padding: 10px 18px;
+  font-size: 0.99rem;
+  font-weight: 600;
+  border-radius: 10px;
+  background: #1f2937;
+  color: #fff;
+  border: 1px solid rgba(0,0,0,.15);
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  transition: background .2s ease, transform .15s ease;
+}
+.project4 .btn:hover,
+.project4 button[type="submit"]:hover{
+  background:#111827;
+  transform: translateY(-2px);
+}
+
+/* Forms (centered stack like proj2) */
+.project4 form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* center labels/inputs */
+  gap: 6px;                /* tight vertical spacing */
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  text-align: center;
+}
+.project4 form label{
+  display: flex;
+  flex-direction: column;  /* label text above input */
+  align-items: center;
+  gap: 2px;
+  font-size: 1.15rem;      /* bigger label text */
+  color: #333;
+}
+.project4 form input,
+.project4 form select{
+  -webkit-appearance: none; appearance: none;
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.18);
+  background: rgba(255,255,255,.9);
+  color: #111;
+  width: 280px;            /* consistent input width */
+  max-width: 100%;
+  margin: 0;
+  text-align: center;      /* center text inside input */
+  box-shadow: 0 4px 10px rgba(0,0,0,.10);
+}
+.project4 form input:focus,
+.project4 form select:focus{
+  outline: none;
+  border-color: #1f2937;
+  box-shadow: 0 0 0 3px rgba(31,41,55,.18);
+}
+
+/* Card / graph container (use for plots or previews) */
+.project4 .card,
+.project4 .learning-curve-container{
+  display: flex;
+  justify-content: center;
+  margin: 24px auto 40px;
+}
+.project4 .card img,
+.project4 .learning-curve-container img{
+  max-width: 95%;
+  height: auto;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.85);
+  padding: 20px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+  transition: transform 0.25s ease;
+}
+.project4 .card img:hover,
+.project4 .learning-curve-container img:hover{
+  transform: scale(1.02);
+}
+
+/* Metrics grid (reuse proj2 look) */
+.project4 .metrics{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px 18px;
+  margin: 16px auto;
+  max-width: 900px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #222;
+}
+.project4 .metrics strong{
+  font-size: 1.25rem;
+  color: #000;
+}
+
+/* Home button (top-left, like proj2) */
+.project4 .home-button{
+  position: fixed;
+  top: 18px; left: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 10px 18px;
+  background: #1f2937;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: background .2s ease, transform .15s ease;
+  z-index: 1000;
+}
+.project4 .home-button:hover{
+  background:#111827;
+  transform: translateY(-2px);
+}
+
+/* Lists inside recommendations (center visually but left-align items) */
+.project4 .recommendations ol,
+.project4 .predicted ol{
+  text-align: left;
+  display: inline-block;
+  margin: 0 auto;
+  padding-left: 1.25rem;
+}
+
+/* --- Override global centering for consent page --- */
+.project4.top-align {
+  display: block;       /* remove flex centering from grid-parent */
+  margin-top: 0;
+  padding-top: 2rem;    /* space from top of page */
+  text-align: center;
+}
+
+/* Title */
+.project4.consent h1 {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+  font-size: 3rem;      /* bigger */
+}
+
+/* Intro */
+.project4.consent .desc {
+  margin-bottom: 2rem;
+  font-size: 1.3rem;    /* increased */
+  line-height: 1.7;
+}
+
+/* Bullet list */
+.project4 .key-list {
+  font-size: 1.3rem;       /* larger */
+  line-height: 1.75;
+  margin: 0 auto 2.4rem;
+  align-items: start;
+}
+.project4 .key-list li {
+  margin: 1rem 0;  
+  align-items: start;        /* extra gap */
+}
+
+/* Explanatory paragraphs */
+.project4 .consent-text {
+  font-size: 1.3rem;       /* larger text */
+  margin: 1.2rem auto 2rem;
+  line-height: 1.75;
+}
+
+/* --- Navigation bar for Project 4 pages --- */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;  /* pushes Home left, Project 4 right */
+  align-items: center;
+  z-index: 1000;
+  background: transparent;         /* keep background see-through */
+}
+
+/* Push page content below the bar so buttons don’t overlap content */
+.page-with-topbar {
+  padding-top: 80px;   /* bar height + a bit of spacing */
+}
+
+/* Individual buttons */
+.home-button,
+.proj4-button {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 10px 18px;
+  background: #1f2937;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: background .2s ease, transform .15s ease;
+  position: static;    /* important: let flexbox handle placement */
+}
+
+.home-button:hover,
+.proj4-button:hover {
+  background: #111827;
+  transform: translateY(-2px);
+}

@@ -20,7 +20,7 @@
   font-weight: 700;
   font-size: 2rem;
   color: #111;
-  margin: 1.2em 0 .4em;
+  margin: 1.2em 0 .6em;
 }
 
 /* Paragraphs */
@@ -155,7 +155,7 @@
   font-size: 1.2rem;
   font-weight: 400;
   color: #292929;
-  margin-top: -0.3rem;
+  margin-top: 0.8rem;
   margin-bottom: 1.5rem;
   line-height: 1.6;
 }
@@ -209,5 +209,7 @@
   color: #000;
 }
 
-
-
+.project2 h1 + p,
+.project2 h2 + p {
+  margin-top: 0.8rem;  /* same spacing */
+}
