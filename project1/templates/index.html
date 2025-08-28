@@ -1,178 +1,194 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block head_extra %}
-<link rel="stylesheet" href="{% static 'project1/style.css' %}">
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'project2.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="page-container">
-  <h1 style="text-align: center; margin-top: 20px;"> Project 1: Automated Machine Learning </h1>
+<div class="project2">
+
+  <a href="{% url 'home:index' %}" class="home-button">Home</a>
+
+  <h1>Project 1: Automated Machine Learning</h1>
 
   <!-- Small description below title -->
   <p class="lead">
-    This project provides an interactive interface for automated machine learning. You can upload a dataset, explore it through visualizations, and train different ML models for both classification and regression tasks. The app guides you through the basic ML pipeline, from data exploration to model evaluation.
+    This project provides an interactive interface for automated machine learning. 
+    You can upload a dataset, explore it through visualizations, and train different ML models 
+    for both classification and regression tasks. The app guides you through the basic ML pipeline, 
+    from data exploration to model evaluation.
   </p>
 
-  <h1>Upload CSV File</h1>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="file" name="csv_file" accept=".csv" required>
-    <button type="submit">Upload</button>
-  </form>
+  <section>
+    <h2>Upload CSV File</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input type="file" name="csv_file" accept=".csv" required>
+      <button type="submit">Upload</button>
+    </form>
+  </section>
 
-{% if data_preview %}
-  <h2 class="section-title">Dataset Preview</h2>
-
-  <div class="data-preview-container">
+  {% if data_preview %}
+    <section>
+      <h2>Dataset Preview</h2>
+      <div class="data-preview-container">
         <style>
-        .data-preview-container { 
-            width: 80% !important;              
-            margin: 10px auto 30px !important;  
-            max-height: 300px !important;
-            padding: 12px !important;
-            border: none !important;
-            background: transparent !important;
-            box-shadow: none !important;
-            overflow-x: auto !important;
-        }
-        .data-preview-container table,
-        .data-preview-container .dataframe {
-            width: 100% !important;              
-            table-layout: fixed !important;      
-            border-collapse: collapse !important;
-            font-size: 11px !important;
-            word-wrap: break-word !important;
-            background: transparent !important;
-        }
-        .data-preview-container th,
-        .data-preview-container td {
-            padding: 4px 6px !important;
-            border: 1px solid #ddd !important;
-            text-align: center !important;
-            font-size: 13px !important;
-            background: transparent !important;
-            font-weight: bold !important;   /* << all text bold */
-        }
+          .data-preview-container { 
+              width: 80% !important;              
+              margin: 10px auto 30px !important;  
+              max-height: 300px !important;
+              padding: 12px !important;
+              border: none !important;
+              background: transparent !important;
+              box-shadow: none !important;
+              overflow-x: auto !important;
+          }
+          .data-preview-container table,
+          .data-preview-container .dataframe {
+              width: 100% !important;              
+              table-layout: fixed !important;      
+              border-collapse: collapse !important;
+              font-size: 11px !important;
+              word-wrap: break-word !important;
+              background: transparent !important;
+          }
+          .data-preview-container th,
+          .data-preview-container td {
+              padding: 4px 6px !important;
+              border: 1px solid #ddd !important;
+              text-align: center !important;
+              font-size: 13px !important;
+          }
         </style>
-    {{ data_preview|safe }}
-  </div>
-{% endif %}
-
-
+        {{ data_preview|safe }}
+      </div>
+    </section>
+  {% endif %}
 
   {% if show_visualize or show_train_form %}
     <hr>
-    <h2>Select Task and Target Column</h2>
-    <form method="post">
-      {% csrf_token %}
-      <label for="target_column">Target Column:</label>
-      <select name="target_column" required>
-        {% for col in columns %}
-          <option value="{{ col }}" {% if col == target_column %}selected{% endif %}>{{ col }}</option>
-        {% endfor %}
-      </select><br><br>
+    <section>
+      <h2>Select Task and Target Column</h2>
+      <form method="post">
+        {% csrf_token %}
+        <label for="target_column">Target Column:</label>
+        <select name="target_column" required>
+          {% for col in columns %}
+            <option value="{{ col }}" {% if col == target_column %}selected{% endif %}>{{ col }}</option>
+          {% endfor %}
+        </select><br><br>
 
-      <label for="task">Problem Type:</label>
-      <select name="task" id="task-select" required>
-        <option value="classification" {% if task == "classification" %}selected{% endif %}>Classification</option>
-        <option value="regression" {% if task == "regression" %}selected{% endif %}>Regression</option>
-      </select><br><br>
+        <label for="task">Problem Type:</label>
+        <select name="task" id="task-select" required>
+          <option value="classification" {% if task == "classification" %}selected{% endif %}>Classification</option>
+          <option value="regression" {% if task == "regression" %}selected{% endif %}>Regression</option>
+        </select><br><br>
 
-      <label for="x_feature">X Feature:</label>
-      <select name="x_feature" required>
-        {% for col in columns %}
-          <option value="{{ col }}" {% if col == x_feature %}selected{% endif %}>{{ col }}</option>
-        {% endfor %}
-      </select><br><br>
+        <label for="x_feature">X Feature:</label>
+        <select name="x_feature" required>
+          {% for col in columns %}
+            <option value="{{ col }}" {% if col == x_feature %}selected{% endif %}>{{ col }}</option>
+          {% endfor %}
+        </select><br><br>
 
-      <label for="y_feature">Y Feature (optional for regression, required for classification):</label>
-      <select name="y_feature">
-        <option value="">-- Optional --</option>
-        {% for col in columns %}
-          <option value="{{ col }}" {% if col == y_feature %}selected{% endif %}>{{ col }}</option>
-        {% endfor %}
-      </select><br><br>
+        <label for="y_feature">Y Feature (optional for regression, required for classification):</label>
+        <select name="y_feature">
+          <option value="">-- Optional --</option>
+          {% for col in columns %}
+            <option value="{{ col }}" {% if col == y_feature %}selected{% endif %}>{{ col }}</option>
+          {% endfor %}
+        </select><br><br>
 
-      <button type="submit" name="visualize">Visualize</button>
-    </form>
+        <button type="submit" name="visualize">Visualize</button>
+      </form>
+    </section>
   {% endif %}
 
   {% if plot_url %}
-    <h2>Generated Plot:</h2>
-    <img src="{{ plot_url }}" alt="Generated plot" style="max-width: 600px; border: 1px solid #ccc;">
+    <section>
+      <h2>Generated Plot</h2>
+      <img src="{{ plot_url }}" alt="Generated plot" style="max-width: 600px; border: 1px solid #ccc;">
+    </section>
   {% endif %}
 
   {% if show_train_form %}
     <hr>
-    <h2>Train a Model</h2>
-    <form method="post">
-      {% csrf_token %}
-      <input type="hidden" name="target_column" value="{{ request.POST.target_column|default:'' }}">
+    <section>
+      <h2>Train a Model</h2>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="target_column" value="{{ request.POST.target_column|default:'' }}">
 
-      <label for="task">Problem Type:</label>
-      <select name="task" id="task-select" required onchange="updateModels()">
-        <option value="classification">Classification</option>
-        <option value="regression">Regression</option>
-      </select><br><br>
+        <label for="task">Problem Type:</label>
+        <select name="task" id="task-select" required onchange="updateModels()">
+          <option value="classification">Classification</option>
+          <option value="regression">Regression</option>
+        </select><br><br>
 
-      <label for="model_type">Choose Model:</label>
-      <select name="model_type" id="model-select" required></select><br><br>
+        <label for="model_type">Choose Model:</label>
+        <select name="model_type" id="model-select" required></select><br><br>
 
-      <button type="submit" name="train">Train Model</button>
-    </form>
+        <button type="submit" name="train">Train Model</button>
+      </form>
 
-    <script>
-      const modelSelect = document.getElementById("model-select");
-      const taskSelect = document.getElementById("task-select");
-      const modelOptions = {
-        classification: [
-          { value: "logistic", text: "Logistic Regression" },
-          { value: "dt", text: "Decision Tree" },
-          { value: "rf", text: "Random Forest" },
-          { value: "knn", text: "K-Nearest Neighbors" },
-          { value: "svm", text: "Support Vector Machine" },
-          { value: "nb", text: "Naive Bayes" }
-        ],
-        regression: [
-          { value: "lasso", text: "Lasso Regression" },
-          { value: "ridge", text: "Ridge Regression" },
-          { value: "xgb", text: "XGBoost Regressor" },
-          { value: "lgbm", text: "LightGBM Regressor" }
-        ]
-      };
-      function updateModels() {
-        const task = taskSelect.value;
-        modelSelect.innerHTML = "";
-        modelOptions[task].forEach(model => {
-          const option = document.createElement("option");
-          option.value = model.value;
-          option.text = model.text;
-          modelSelect.appendChild(option);
-        });
-      }
-      updateModels();
-    </script>
+      <script>
+        const modelSelect = document.getElementById("model-select");
+        const taskSelect = document.getElementById("task-select");
+        const modelOptions = {
+          classification: [
+            { value: "logistic", text: "Logistic Regression" },
+            { value: "dt", text: "Decision Tree" },
+            { value: "rf", text: "Random Forest" },
+            { value: "knn", text: "K-Nearest Neighbors" },
+            { value: "svm", text: "Support Vector Machine" },
+            { value: "nb", text: "Naive Bayes" }
+          ],
+          regression: [
+            { value: "lasso", text: "Lasso Regression" },
+            { value: "ridge", text: "Ridge Regression" },
+            { value: "xgb", text: "XGBoost Regressor" },
+            { value: "lgbm", text: "LightGBM Regressor" }
+          ]
+        };
+        function updateModels() {
+          const task = taskSelect.value;
+          modelSelect.innerHTML = "";
+          modelOptions[task].forEach(model => {
+            const option = document.createElement("option");
+            option.value = model.value;
+            option.text = model.text;
+            modelSelect.appendChild(option);
+          });
+        }
+        updateModels();
+      </script>
+    </section>
   {% endif %}
 
   {% if model_label %}
-    <h3 style="margin-top: 20px;">Model Info:</h3>
-    <p><strong>The model being implemented is:</strong> {{ model_label }}</p>
+    <section>
+      <h3>Model Info</h3>
+      <p><strong>The model being implemented is:</strong> {{ model_label }}</p>
+    </section>
   {% endif %}
 
   {% if evaluation_result %}
-    <h3>Model Evaluation Result:</h3>
-    {% if task == "classification" %}
-      <p><strong>Accuracy:</strong> {{ evaluation_result.accuracy }}</p>
-      <p><strong>Precision:</strong> {{ evaluation_result.precision }}</p>
-      <p><strong>Recall:</strong> {{ evaluation_result.recall }}</p>
-      <p><strong>F1-Score:</strong> {{ evaluation_result.f1_score }}</p>
-    {% elif task == "regression" %}
-      <p><strong>Mean Absolute Error:</strong> {{ evaluation_result.mae }}</p>
-      <p><strong>Mean Squared Error:</strong> {{ evaluation_result.mse }}</p>
-      <p><strong>Root Mean Squared Error:</strong> {{ evaluation_result.rmse }}</p>
-      <p><strong>R² Score:</strong> {{ evaluation_result.r2 }}</p>
-    {% endif %}
+    <section>
+      <h3>Model Evaluation Result</h3>
+      {% if task == "classification" %}
+        <p><strong>Accuracy:</strong> {{ evaluation_result.accuracy }}</p>
+        <p><strong>Precision:</strong> {{ evaluation_result.precision }}</p>
+        <p><strong>Recall:</strong> {{ evaluation_result.recall }}</p>
+        <p><strong>F1-Score:</strong> {{ evaluation_result.f1_score }}</p>
+      {% elif task == "regression" %}
+        <p><strong>Mean Absolute Error:</strong> {{ evaluation_result.mae }}</p>
+        <p><strong>Mean Squared Error:</strong> {{ evaluation_result.mse }}</p>
+        <p><strong>Root Mean Squared Error:</strong> {{ evaluation_result.rmse }}</p>
+        <p><strong>R² Score:</strong> {{ evaluation_result.r2 }}</p>
+      {% endif %}
+    </section>
   {% endif %}
+
 </div>
 {% endblock %}
