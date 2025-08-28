@@ -1,14 +1,20 @@
 {% extends "base.html" %}
 {% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'project2.css' %}">
+{% endblock %}
+
 {% block content %}
 <h2>Grid Preview</h2>
 
-<p>
-  <a href="{% url 'project5:preview' %}?seed={{ seed|add:'1' }}">Reshuffle</a>
-  ·
-  <a href="{% url 'project5:index' %}">Back</a>
-</p>
+<!-- Controls ABOVE the grid -->
+<div class="controls">
+  <a class="btn" href="{% url 'project5:preview' %}?seed={{ seed|add:'1' }}">🔄 Reshuffle</a>
+  <a class="btn btn-secondary" href="{% url 'project5:index' %}">← Back</a>
+</div>
 
+<!-- Grid -->
 <div class="gw">
   {% for row in grid %}
     {% for cell in row %}
@@ -17,6 +23,7 @@
   {% endfor %}
 </div>
 
+<!-- Legend -->
 <div class="legend">
   <div><span class="leg tile tile-mouse">🐭</span> Mouse</div>
   <div><span class="leg tile tile-cheese">🧀</span> Cheese</div>
