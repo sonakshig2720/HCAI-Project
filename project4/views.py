@@ -481,3 +481,12 @@ def details(request):
     gpairs = d.get('guidance_pairs') or []
     d['guidance_pairs'] = [{'before': p[0], 'after': p[1]} for p in gpairs if isinstance(p, (list, tuple)) and len(p) == 2]
     return render(request, 'project4/details.html', d)
+
+
+def restart_study(request):
+    """Clears session data so the study restarts fresh."""
+    request.session['ratings'] = {}
+    request.session['ratings_done'] = 0
+    request.session['last_get_ts'] = None
+    request.session['details'] = None
+    return redirect('project4:study')

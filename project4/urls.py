@@ -8,6 +8,7 @@ urlpatterns = [
     path('consent/',    views.consent,       name='consent'),
     path('pre/',        views.pre_survey,    name='pre'),
     path('study/',      views.study,         name='study'),
+    path('restart/', views.restart_study, name='restart'),   # NEW
     path('post/',       views.post_survey,   name='post'),
     path('debrief/',    views.debrief,       name='debrief'),
     path('details/',   views.details,      name='details'),  # simple summary page

@@ -170,8 +170,8 @@
   color: #000;
 }
 
-/* Home button (top-left, like proj2) */
-.project4 .home-button{
+/* Home button — ONLY fixed on pages WITHOUT the top bar */
+.project4:not(.page-with-topbar) .home-button{
   position: fixed;
   top: 18px; left: 20px;
   font-family: 'Montserrat', sans-serif;
@@ -186,7 +186,7 @@
   transition: background .2s ease, transform .15s ease;
   z-index: 1000;
 }
-.project4 .home-button:hover{
+.project4:not(.page-with-topbar) .home-button:hover{
   background:#111827;
   transform: translateY(-2px);
 }
@@ -261,7 +261,7 @@
   padding-top: 80px;   /* bar height + a bit of spacing */
 }
 
-/* Individual buttons */
+/* Individual buttons (default look) */
 .home-button,
 .proj4-button {
   font-family: 'Montserrat', sans-serif;
@@ -274,11 +274,313 @@
   text-decoration: none;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   transition: background .2s ease, transform .15s ease;
-  position: static;    /* important: let flexbox handle placement */
 }
-
 .home-button:hover,
 .proj4-button:hover {
   background: #111827;
   transform: translateY(-2px);
+}
+
+/* Pre-survey page styles (reuse project4 look) */
+.project4.pre {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+/* Title */
+.project4.pre h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 2.4rem;
+  margin-bottom: 1.2rem;
+  color: #111;
+}
+
+/* Labels + explanation text grouped */
+.project4.pre .question {
+  margin: 1.6rem 0;
+  text-align: center;
+}
+
+.project4.pre .explain {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 0.5rem;   /* space between text and input */
+}
+
+/* Input box */
+.project4.pre input[type="number"] {
+  width: 100px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.2);
+  font-size: 1.1rem;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,.1);
+}
+
+/* Button */
+.project4.pre button {
+  margin-top: 24px;
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: #1f2937;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  transition: background .2s ease, transform .15s ease;
+}
+.project4.pre button:hover {
+  background: #111827;
+  transform: translateY(-2px);
+}
+
+/* Top nav bar (same as consent) */
+.top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+  background: transparent;
+}
+.page-with-topbar { padding-top: 80px; }
+
+.home-button,
+.proj4-button {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 10px 18px;
+  background: #1f2937;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transition: background .2s ease, transform .15s ease;
+}
+.home-button:hover,
+.proj4-button:hover {
+  background: #111827;
+  transform: translateY(-2px);
+}
+
+/* ===== Study page (Project 4) ===== */
+
+/* Page wrapper */
+.project4.study {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+/* Title */
+.project4.study h1{
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 2.4rem;
+  color:#111;
+  margin-bottom: 1.1rem;
+}
+
+/* Card look used for each section */
+.project4 .card{
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(0,0,0,.18);
+  padding: 18px 22px;
+  margin: 16px auto;
+  width: min(820px, 95vw);
+}
+
+/* Card headings */
+.project4 .card h2{
+  margin: 0 0 .6rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.45rem;
+  color:#111;
+}
+
+/* Recommendation lists: visually centered, items left-aligned */
+.project4 .recommendations ol {
+  text-align: left;
+  display: inline-block;
+  margin: 0.6rem auto 0.8rem;
+  padding-left: 1.4rem;
+  line-height: 1.7;
+  font-size: 1.15rem;   /* larger */
+  font-weight: 400;
+  color: #222;
+}
+
+.project4 .recommendations li {
+  margin: 0.3rem 0;
+}
+
+/* Movie title display */
+.project4 .rating-form p strong {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  color: #111;
+}
+.project4 .rating-form p {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+/* Rating form input */
+.project4 .rating-input {
+  width: 160px;
+  font-size: 1.1rem;
+  padding: 10px 14px;
+  margin-top: 0.5rem;
+  margin-bottom: 1.2rem;
+  border-radius: 8px;
+}
+
+/* Label above input */
+.project4 .rating-form label {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin-bottom: 0.3rem;
+  color: #222;
+}
+
+/* Buttons */
+.project4 .btn-group {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.project4 .btn {
+  min-width: 200px;
+  padding: 12px 20px;
+  font-size: 1.2rem;
+}
+
+.project4 .btn-primary{
+  background:#1f2937;
+  color:#fff;
+  border: 1px solid rgba(0,0,0,.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+.project4 .btn-primary:hover{ background:#111827; transform: translateY(-2px); }
+
+.project4 .btn-outline{
+  background: transparent;
+  color:#1f2937;
+  border: 1px solid rgba(0,0,0,.2);
+}
+.project4 .btn-outline:hover{ background: rgba(31,41,55,.08); transform: translateY(-2px); }
+
+/* ===== Top bar placement for Details (Home left, Study+Project4 right) ===== */
+.top-bar{
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 60px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;   /* left + right groups */
+  align-items: center;
+  z-index: 1000;
+  background: transparent;
+}
+.page-with-topbar { padding-top: 80px; }
+
+.home-left { display: flex; align-items: center; }
+.right-actions { display: flex; align-items: center; gap: 10px; }
+
+/* Reuse the same button look */
+.home-button,
+.proj4-button{
+  font-family:'Montserrat',sans-serif;
+  font-weight:600; font-size:0.95rem;
+  padding:10px 18px;
+  background:#1f2937; color:#fff;
+  border-radius:8px; text-decoration:none;
+  box-shadow:0 4px 10px rgba(0,0,0,.2);
+  transition: background .2s ease, transform .15s ease;
+}
+.home-button:hover,
+.proj4-button:hover{ background:#111827; transform: translateY(-2px); }
+
+/* ===== Details page alignment ===== */
+.project4.details {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.project4.details h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 2.3rem;
+  margin-bottom: 1.2rem;
+  color: #111;
+}
+
+/* Unified card width + center */
+.project4.details .card {
+  width: min(820px, 95vw);
+  margin: 16px auto;
+  text-align: center;
+}
+
+/* Headings inside cards */
+.project4.details .card h2{
+  margin: 0 0 .6rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 1.45rem;
+  color:#111;
+}
+
+/* Big value line */
+.project4.details .metric{
+  font-size: 1.35rem;
+  margin: .2rem 0 .6rem;
+}
+
+/* Impact list: left-aligned, centered block */
+.project4.details .impact-list{
+  text-align: left;
+  display: inline-block;
+  margin: .6rem auto 0;
+  padding-left: 1.2rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #333;
+  max-width: 680px;
+}
+.project4.details .impact-list li{ margin: .4rem 0; }
+
+.project4.details .label{ color:#444; font-weight:600; margin-right:.4rem; }
+.project4.details .note{ color:#555; font-size:.95rem; margin-top:.5rem; font-style: italic; }
+
+/* Bottom nav buttons */
+.project4.details .nav-links{
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
 }
