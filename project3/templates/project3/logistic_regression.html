@@ -1,102 +1,52 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Logistic Regression Results</title>
-    <style>
-      body {
-        background-image: url("{% static 'images/bg.jpeg' %}");
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-      }
 
-      .page-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 40px;
-        text-align: center;
-      }
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'project2.css' %}">
+{% endblock %}
 
-      h2 {
-        margin-top: 20px;
-        font-size: 28px;
-        text-align: center;
-      }
+{% block content %}
+<div class="project2">
 
-      form {
-        margin: 20px auto;
-        text-align: center;
-      }
+  <a href="{% url 'home:index' %}" class="home-button">Home</a>
 
-      label {
-        font-weight: bold;
-        margin-right: 10px;
-      }
+  <section>
+    <h1>Logistic Regression with Feature Sparsity</h1>
 
-      input[type="range"] {
-        width: 300px;
-        margin: 10px 0;
-      }
-
-      button {
-        padding: 6px 12px;
-        margin-top: 10px;
-        border: none;
-        border-radius: 4px;
-        background-color: #4CAF50;
-        color: white;
-        font-size: 14px;
-        cursor: pointer;
-      }
-
-      button:hover {
-        background-color: #45a049;
-      }
-
-      p {
-        font-size: 16px;
-        margin: 8px 0;
-        text-align: center;
-      }
-
-      a {
-        display: inline-block;
-        margin-top: 20px;
-        text-decoration: none;
-        font-weight: bold;
-        color: #333;
-      }
-
-      a:hover {
-        text-decoration: underline;
-      }
-    </style>
-</head>
-<body>
-  <div class="page-container">
-    <h2>Logistic Regression with Feature Sparsity</h2>
-
-    <form method="post">
-        {% csrf_token %}
-        <label for="lambda">Lambda (λ):</label>
-        <input type="range" name="lambda" id="lambda" min="0.0" max="1.0" step="0.05" value="{{ lambda }}">
-        <span>{{ lambda }}</span>
-        <br><button type="submit">Show</button>
+    <form method="post" class="form-block">
+      {% csrf_token %}
+      <label for="lambda"><strong>Lambda (λ):</strong></label>
+      <input
+        type="range"
+        name="lambda"
+        id="lambda"
+        min="0.0"
+        max="1.0"
+        step="0.05"
+        value="{{ lambda|default:0.0 }}"
+        oninput="document.getElementById('lambdaVal').textContent=this.value"
+      />
+      <span id="lambdaVal">{{ lambda|default:0.0 }}</span>
+      <br/>
+      <button type="submit">Show</button>
     </form>
 
     {% if accuracy %}
-        <p>Accuracy: {{ accuracy }}%</p>
-        <p>Number of Features Used: {{ features_used }}</p>
+      <div class="metrics">
+        <div><strong>Accuracy:</strong> {{ accuracy }}%</div>
+        <div><strong>Number of Features Used:</strong> {{ features_used }}</div>
         {% if error %}
-            <p style="color: red;">{{ error }}</p>
+          <div style="padding:8px;border:1px solid #d33;background:#fee;color:#900;margin-top:0.75rem;">
+            {{ error }}
+          </div>
         {% endif %}
+      </div>
     {% endif %}
 
-    <br><a href="{% url 'project3:index' %}">Back to Index</a>
-  </div>
-</body>
-</html>
+    <div style="margin-top:1.25rem;">
+      <a href="{% url 'project3:index' %}" class="home-button">Back to Index</a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

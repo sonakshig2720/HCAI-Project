@@ -1,130 +1,78 @@
+{% extends 'base.html' %}
 {% load static %}
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Task 2 — Compare Trajectories</title>
-    <style>
-      :root{
-        --fg:#222; --muted:#666; --border:#e5e5e5;
-        --card:#fbfbfb; --btn-bg:#fafafa; --btn-border:#ddd; --btn-hover:#f2f2f2;
-      }
 
-      body{
-        margin:0; font-family:Arial, Helvetica, sans-serif; color:var(--fg);
-        background-image:url("{% static 'images/bg.jpeg' %}");
-        background-size:cover; background-repeat:no-repeat; background-attachment:fixed;
-      }
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'project2.css' %}">
+{% endblock %}
 
-      .wrap{ max-width:1200px; margin:24px auto; padding:0 40px; }
-      h2{ text-align:center; margin:12px 0 18px; }
+{% block content %}
+<div class="project2">
 
-      .flex{ display:flex; gap:24px; flex-wrap:wrap; justify-content:center; }
+  <a href="{% url 'home:index' %}" class="home-button">Home</a>
 
-      .trajbox{
-        border:1px solid var(--border);
-        padding:14px;
-        border-radius:12px;
-        width:280px;
-        background:var(--card);
-        box-shadow:0 1px 0 rgba(0,0,0,.03);
-      }
+  <section>
+    <h1>Choose the better trajectory</h1>
 
-      .trajbox h3{ margin:0 0 8px; font-size:20px; }
-      .meta{ color:#555; font-size:14px; }
+    {% if message %}
+      <p>{{ message }}</p>
+      <div class="btn-row" style="margin-top:0.75rem;">
+        <a class="home-button" href="{% url 'project5:sample' %}">Sample trajectories</a>
+        <a class="home-button" href="{% url 'project5:index' %}">Back to page</a>
+      </div>
+    {% else %}
+      <form method="post" class="form-block">
+        {% csrf_token %}
+        <input type="hidden" name="idx_a" value="{{ idx_a }}">
+        <input type="hidden" name="idx_b" value="{{ idx_b }}">
 
-      .bar{ height:8px; background:#eee; border-radius:5px; margin:8px 0 10px; }
-
-      /* Buttons unified */
-      .btn{
-        padding:10px 16px;
-        border:1px solid var(--btn-border);
-        border-radius:8px;
-        background:var(--btn-bg);
-        text-decoration:none;
-        cursor:pointer;
-        font-size:15px;
-        font-weight:500;
-        color:#222;
-        display:inline-block;
-        transition:background .15s ease, transform .02s ease;
-      }
-      .btn:hover{ background:var(--btn-hover); }
-      .btn:active{ transform:translateY(1px); }
-
-      /* Controls row centered */
-      .controls{
-        margin-top:16px;
-        display:flex;
-        justify-content:center;
-        gap:16px;
-        flex-wrap:wrap;
-        align-items:center;
-      }
-
-      /* Collected so far bigger + black */
-      .collected{
-        color:#000;
-        font-size:18px;   /* was 13px muted → now bigger */
-        font-weight:bold;
-        text-align:center;
-        margin-top:8px;
-      }
-
-      /* Responsive tweaks */
-      @media (max-width:900px){ .wrap{ padding:0 16px; } }
-    </style>
-  </head>
-  <body>
-    <div class="wrap">
-      <h2>Task 2 — Choose the better trajectory</h2>
-
-      {% if message %}
-        <p>{{ message }}</p>
-        <div class="controls">
-          <a class="btn" href="{% url 'project5:sample' %}">Sample trajectories</a>
-          <a class="btn" href="{% url 'project5:index' %}">Back to page</a>
-        </div>
-      {% else %}
-        <form method="post">
-          {% csrf_token %}
-          <input type="hidden" name="idx_a" value="{{ idx_a }}">
-          <input type="hidden" name="idx_b" value="{{ idx_b }}">
-
-          <div class="flex">
-            <div class="trajbox">
+        <div class="card-grid" style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;">
+          <div class="card" style="min-width:260px;max-width:320px;">
+            <div class="card-body">
               <h3>A</h3>
-              <div class="meta">Length: {{ A.length }}</div>
-              <div class="meta">Return: {{ A.return|floatformat:2 }}</div>
-              <div class="meta">Cheese steps: {{ A.cheese }}</div>
-              <div class="meta">Trap hits: {{ A.traps }}</div>
-              <div class="bar"></div>
-              <label><input type="radio" name="preference" value="A" checked> Prefer A</label>
+              <div class="metrics" style="margin-top:0.5rem;">
+                <div><strong>Length:</strong> {{ A.length }}</div>
+                <div><strong>Return:</strong> {{ A.return|floatformat:2 }}</div>
+                <div><strong>Cheese steps:</strong> {{ A.cheese }}</div>
+                <div><strong>Trap hits:</strong> {{ A.traps }}</div>
+              </div>
+              <div style="margin-top:0.75rem;">
+                <label><input type="radio" name="preference" value="A" {% if not preference or preference == 'A' %}checked{% endif %}> Prefer A</label>
+              </div>
             </div>
+          </div>
 
-            <div class="trajbox">
+          <div class="card" style="min-width:260px;max-width:320px;">
+            <div class="card-body">
               <h3>B</h3>
-              <div class="meta">Length: {{ B.length }}</div>
-              <div class="meta">Return: {{ B.return|floatformat:2 }}</div>
-              <div class="meta">Cheese steps: {{ B.cheese }}</div>
-              <div class="meta">Trap hits: {{ B.traps }}</div>
-              <div class="bar"></div>
-              <label><input type="radio" name="preference" value="B"> Prefer B</label>
+              <div class="metrics" style="margin-top:0.5rem;">
+                <div><strong>Length:</strong> {{ B.length }}</div>
+                <div><strong>Return:</strong> {{ B.return|floatformat:2 }}</div>
+                <div><strong>Cheese steps:</strong> {{ B.cheese }}</div>
+                <div><strong>Trap hits:</strong> {{ B.traps }}</div>
+              </div>
+              <div style="margin-top:0.75rem;">
+                <label><input type="radio" name="preference" value="B" {% if preference == 'B' %}checked{% endif %}> Prefer B</label>
+              </div>
             </div>
           </div>
-
-          <div class="controls">
-            <button class="btn" type="submit">Submit preference</button>
-            <a class="btn" href="{% url 'project5:compare' %}">Show another pair</a>
-          </div>
-
-          <p class="collected">Collected so far: {{ num_prefs }}</p>
-        </form>
-
-        <div class="controls">
-          <a class="btn" href="{% url 'project5:index' %}">Back to page</a>
         </div>
-      {% endif %}
-    </div>
-  </body>
-</html>
+
+        <div style="margin-top:1rem;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button type="submit">Submit preference</button>
+          <a class="btn" href="{% url 'project5:compare' %}">Show another pair</a>
+        </div>
+
+        <p style="text-align:center;margin-top:0.75rem;">
+          <strong>Collected so far:</strong> {{ num_prefs }}
+        </p>
+      </form>
+
+      <p> Go to back page once you have collected enough preferences </p>
+      <div style="margin-top:1rem;">
+        <a href="{% url 'project5:index' %}" class="home-button">Back to page</a>
+      </div>
+    {% endif %}
+  </section>
+
+</div>
+{% endblock %}

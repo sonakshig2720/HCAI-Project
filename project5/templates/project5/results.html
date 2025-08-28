@@ -1,10 +1,22 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'project2.css' %}">
+{% endblock %}
+
 {% block content %}
 <h2>Training Results</h2>
-<ul>
-  <li>Trained: {{ info.trained }}</li>
-  <li>Mean episodic return (eval): {{ info.mean_return }}</li>
-  <li>Std episodic return (eval): {{ info.std_return }}</li>
+
+<!-- Results list (no bullets) -->
+<ul class="results-list">
+  <li><strong>Trained:</strong> {{ info.trained }}</li>
+  <li><strong>Mean episodic return (eval):</strong> {{ info.mean_return }}</li>
+  <li><strong>Std episodic return (eval):</strong> {{ info.std_return }}</li>
 </ul>
-<p><a href="{% url 'project5:index' %}">Back</a></p>
+
+<!-- Back button -->
+<div class="controls">
+  <a class="btn btn-secondary" href="{% url 'project5:index' %}">← Back</a>
+</div>
 {% endblock %}

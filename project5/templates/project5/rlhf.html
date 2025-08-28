@@ -1,9 +1,22 @@
-
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'project2.css' %}">
+{% endblock %}
+
 {% block content %}
-<h2>KL-penalized RLHF fine-tune</h2>
-<form method="post">{% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Start RLHF</button>
-</form>
+<h2>KL-penalized RLHF Fine-Tune</h2>
+
+<div class="form-container">
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">🚀 Start RLHF</button>
+  </form>
+</div>
+
+<div class="controls">
+  <a class="btn btn-secondary" href="{% url 'project5:index' %}">← Back</a>
+</div>
 {% endblock %}
