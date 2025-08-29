@@ -1,7 +1,35 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{% static 'project4.css' %}?v=11">
+{% endblock %}
+
 {% block content %}
-  <h1>Debrief</h1>
-  <p>Thanks for participating! Your anonymous id: <code>{{ pid }}</code></p>
-  <p>You were randomly assigned to a condition (guided vs control). Data is stored anonymously for analysis.</p>
-  <p><a href="{% url 'project4:index' %}">Back to Project 4</a></p>
+<div class="project4 debrief page-with-topbar">
+
+  <!-- Top navigation bar -->
+  <div class="top-bar">
+    <a href="{% url 'home:index' %}" class="home-button">Home</a>
+  </div>
+
+  <!-- Title -->
+  <h1>Thank You!</h1>
+
+  <!-- Messages stacked vertically -->
+  <p class="debrief-text">
+    Your participation in this study is greatly appreciated.  
+    The data you provided will help us improve recommender systems.
+  </p>
+
+  <p class="debrief-text">
+    You have now completed all tasks. If you have any questions about this study,  
+    please contact the course instructors.
+  </p>
+
+  <p class="debrief-text">
+    You may close this page, or click <strong>Home</strong> to return.
+  </p>
+
+</div>
 {% endblock %}

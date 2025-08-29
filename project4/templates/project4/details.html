@@ -15,6 +15,7 @@
     </div>
     <div class="right-actions">
       <a href="{% url 'project4:restart' %}" class="proj4-button">New Study</a>
+      <a href="{% url 'project4:debrief' %}" class="proj4-button">End Survey</a>
       <a href="{% url 'project4:index' %}" class="proj4-button">Project 4</a>
     </div>
   </div>
@@ -60,7 +61,6 @@
     <p class="metric"><strong>{{ info_gain }}</strong></p>
     <p>Magnitude of change in your latent profile if you love the current movie.</p>
   </section>
-
 
 </div>
 {% endblock %}

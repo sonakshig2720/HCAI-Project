@@ -584,3 +584,45 @@
   justify-content: center;
   gap: 14px;
 }
+
+/* Debrief page */
+.project4.debrief h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 2.6rem;
+  margin-bottom: 1.5rem;
+  color: #111;
+}
+
+.project4 .debrief-text {
+  font-size: 1.25rem;
+  line-height: 1.8;
+  color: #333;
+  margin: 1rem auto;
+  max-width: 850px;
+}
+
+
+.project4.debrief .desc {
+  font-size: 1.25rem;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.project4.debrief .card {
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 14px;
+  padding: 20px 28px;
+  max-width: 800px;
+  margin: 0 auto;
+  box-shadow: 0 8px 20px rgba(0,0,0,.15);
+}
+
+/* Button group at bottom of details */
+.project4.details .btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 2rem;
+}
