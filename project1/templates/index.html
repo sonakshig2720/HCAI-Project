@@ -18,7 +18,6 @@
     for both classification and regression tasks.
   </p>
 
-
   <!-- 1) Upload -->
   <section>
     <h2>Upload CSV File</h2>
@@ -169,15 +168,19 @@
 
         <label for="model_type">Choose Model:</label>
         <select name="model_type" id="model-select" required>
-          <option value="" disabled selected>Select a model</option>
+          <option value="" disabled>Select a model</option>
         </select><br><br>
 
         <div id="hp-fields" class="hp-container">
           <p class="muted">Pick a model to see its hyperparameters.</p>
         </div>
 
+        <!-- Inline warning area (hidden until needed) -->
+        <div id="hp-warning" class="status error"
+             style="display:none; margin-top:8px;">
+        </div>
+
         <button type="submit" name="train" value="1" id="train-btn">Train Model</button>
-        <!-- Centered Change selection button (inline CSS) -->
         <button type="button" id="change-btn" class="btn btn-secondary"
                 style="display:none; margin:12px auto 0; display:block; text-align:center;">
           Change selection
@@ -188,14 +191,19 @@
       document.addEventListener("DOMContentLoaded", function() {
         const modelSelect  = document.getElementById("model-select");
         const taskSelectV  = document.getElementById("task-train");
-        const targetSelect = document.getElementById("target_column-train");
         const hpFields     = document.getElementById("hp-fields");
+        const warningBox   = document.getElementById("hp-warning");
         const splitMode    = document.getElementById("split-mode");
         const valWrap      = document.getElementById("val-size-wrap");
         const stratifyWrap = document.getElementById("stratify-wrap");
+        const trainBtn     = document.getElementById("train-btn");
         const changeBtn    = document.getElementById("change-btn");
 
-        // Model options
+        // Prefill state from backend
+        const PRE_SELECTED_MODEL = "{{ selected_model_type|default:'' }}";
+        let PRE_HP = {};
+        try { PRE_HP = JSON.parse('{{ selected_hp_json|default:"{}"|safe }}'); } catch(e) { PRE_HP = {}; }
+
         const MODEL_OPTIONS = {
           classification: [
             { value: "logistic", text: "Logistic Regression" },
@@ -219,67 +227,108 @@
         const HP_SCHEMA = {
           classification: {
             logistic: {
-              C: { type: "float", min: 0.0001, max: 1000, step: 0.1, default: 1.0 },
-              penalty: { type: "choice", choices: ["l2", "l1", "elasticnet"], default: "l2" },
-              solver: { type: "choice", choices: ["lbfgs","liblinear","saga"], default: "lbfgs" },
-              max_iter: { type: "int", min: 50, max: 5000, step: 50, default: 200 }
+              C: { type: "float", min: 0.0001, max: 1000, default: 1.0,
+                   desc: "(Inverse regularization, 0.0001–1000; higher = less reg.)" },
+              penalty: { type: "choice", choices: ["l2", "l1", "elasticnet"], default: "l2",
+                   desc: "(Regularization type: l2/l1/elasticnet)" },
+              solver: { type: "choice", choices: ["lbfgs","liblinear","saga"], default: "lbfgs",
+                   desc: "(Optimizer; l1 needs liblinear/saga; elasticnet needs saga)" },
+              l1_ratio: { type: "float", min: 0.0, max: 1.0, default: 0.5,
+                   desc: "(Only if penalty=elasticnet; 0–1)" },
+              max_iter: { type: "int", min: 50, max: 5000, step: 50, default: 200,
+                   desc: "(Max iterations, 50–5000)" }
             },
             dt: {
-              criterion: { type: "choice", choices: ["gini","entropy","log_loss"], default: "gini" },
-              max_depth: { type: "int_or_none", min: 1, max: 200, step: 1, default: null },
-              min_samples_split: { type: "int", min: 2, max: 50, step: 1, default: 2 },
-              min_samples_leaf: { type: "int", min: 1, max: 50, step: 1, default: 1 }
+              criterion: { type: "choice", choices: ["gini","entropy","log_loss"], default: "gini",
+                   desc: "(Split metric: gini/entropy/log_loss)" },
+              max_depth: { type: "int_or_none", min: 1, max: 200, step: 1, default: null,
+                   desc: "(Tree depth, 1–200; blank=None)" },
+              min_samples_split: { type: "int", min: 2, max: 50, step: 1, default: 2,
+                   desc: "(Min samples to split, 2–50)" },
+              min_samples_leaf: { type: "int", min: 1, max: 50, step: 1, default: 1,
+                   desc: "(Min samples at leaf, 1–50)" }
             },
             rf: {
-              n_estimators: { type: "int", min: 10, max: 2000, step: 10, default: 100 },
-              max_depth: { type: "int_or_none", min: 1, max: 200, step: 1, default: null },
-              min_samples_split: { type: "int", min: 2, max: 50, step: 1, default: 2 },
-              min_samples_leaf: { type: "int", min: 1, max: 50, step: 1, default: 1 }
+              n_estimators: { type: "int", min: 10, max: 2000, step: 10, default: 100,
+                   desc: "(Number of trees, 10–2000)" },
+              max_depth: { type: "int_or_none", min: 1, max: 200, step: 1, default: null,
+                   desc: "(Tree depth, 1–200; blank=None)" },
+              min_samples_split: { type: "int", min: 2, max: 50, step: 1, default: 2,
+                   desc: "(Min samples to split, 2–50)" },
+              min_samples_leaf: { type: "int", min: 1, max: 50, step: 1, default: 1,
+                   desc: "(Min samples at leaf, 1–50)" }
             },
             knn: {
-              n_neighbors: { type: "int", min: 1, max: 100, step: 1, default: 5 },
-              weights: { type: "choice", choices: ["uniform","distance"], default: "uniform" }
+              n_neighbors: { type: "int", min: 1, max: 100, step: 1, default: 5,
+                   desc: "(Neighbors, 1–100)" },
+              weights: { type: "choice", choices: ["uniform","distance"], default: "uniform",
+                   desc: "(Voting: uniform/distance)" }
             },
             svm: {
-              C: { type: "float", min: 0.0001, max: 1000, step: 0.1, default: 1.0 },
-              kernel: { type: "choice", choices: ["rbf","linear","poly","sigmoid"], default: "rbf" },
-              gamma: { type: "choice", choices: ["scale","auto"], default: "scale" }
+              C: { type: "float", min: 0.0001, max: 1000, default: 1.0,
+                   desc: "(Regularization, 0.0001–1000; higher = harder margin)" },
+              kernel: { type: "choice", choices: ["rbf","linear","poly","sigmoid"], default: "rbf",
+                   desc: "(Kernel type: rbf/linear/poly/sigmoid)" },
+              gamma: { type: "choice", choices: ["scale","auto"], default: "scale",
+                   desc: "(Kernel coef: scale/auto)" }
             },
-            nb: {}
+            nb: {
+              var_smoothing: { type: "float", min: 1e-12, max: 1e-6, default: 1e-9,
+                   desc: "(Stability term, 1e-12–1e-6)" }
+            }
           },
           regression: {
             lasso: {
-              alpha: { type: "float", min: 0.0, max: 10, step: 0.001, default: 1.0 },
-              max_iter: { type: "int", min: 50, max: 20000, step: 50, default: 1000 }
+              alpha: { type: "float", min: 0.0, max: 10, default: 1.0,
+                   desc: "(L1 regularization ≥0; typical 0–1)" },
+              max_iter: { type: "int", min: 50, max: 20000, step: 50, default: 1000,
+                   desc: "(Max iterations, 50–20000)" }
             },
             ridge: {
-              alpha: { type: "float", min: 0.0, max: 10, step: 0.001, default: 1.0 },
-              solver: { type: "choice", choices: ["auto","svd","cholesky","lsqr","sparse_cg","sag","saga"], default: "auto" }
+              alpha: { type: "float", min: 0.0, max: 10, default: 1.0,
+                   desc: "(L2 regularization ≥0; typical 0–10)" },
+              solver: { type: "choice", choices: ["auto","svd","cholesky","lsqr","sparse_cg","sag","saga"], default: "auto",
+                   desc: "(Optimization solver)" }
             },
             rf: {
-              n_estimators: { type: "int", min: 10, max: 2000, step: 10, default: 100 },
-              max_depth: { type: "int_or_none", min: 1, max: 200, step: 1, default: null },
-              min_samples_split: { type: "int", min: 2, max: 50, step: 1, default: 2 },
-              min_samples_leaf: { type: "int", min: 1, max: 50, step: 1, default: 1 }
+              n_estimators: { type: "int", min: 10, max: 2000, step: 10, default: 100,
+                   desc: "(Number of trees, 10–2000)" },
+              max_depth: { type: "int_or_none", min: 1, max: 200, step: 1, default: null,
+                   desc: "(Tree depth, 1–200; blank=None)" },
+              min_samples_split: { type: "int", min: 2, max: 50, step: 1, default: 2,
+                   desc: "(Min samples to split, 2–50)" },
+              min_samples_leaf: { type: "int", min: 1, max: 50, step: 1, default: 1,
+                   desc: "(Min samples at leaf, 1–50)" }
             },
             xgb: {
-              n_estimators: { type: "int", min: 10, max: 5000, step: 10, default: 200 },
-              max_depth: { type: "int", min: 1, max: 20, step: 1, default: 6 },
-              learning_rate: { type: "float", min: 0.001, max: 1, step: 0.001, default: 0.1 },
-              subsample: { type: "float", min: 0.1, max: 1, step: 0.01, default: 1.0 },
-              colsample_bytree: { type: "float", min: 0.1, max: 1, step: 0.01, default: 1.0 }
+              n_estimators: { type: "int", min: 10, max: 5000, step: 10, default: 200,
+                   desc: "(Boosting rounds, 10–5000)" },
+              max_depth: { type: "int", min: 1, max: 20, step: 1, default: 6,
+                   desc: "(Tree depth, 1–20)" },
+              learning_rate: { type: "float", min: 0.001, max: 1, default: 0.1,
+                   desc: "(Shrinkage, 0.001–1; typical 0.01–0.3)" },
+              subsample: { type: "float", min: 0.1, max: 1, default: 1.0,
+                   desc: "(Row sampling per tree, 0.1–1)" },
+              colsample_bytree: { type: "float", min: 0.1, max: 1, default: 1.0,
+                   desc: "(Feature sampling per tree, 0.1–1)" }
             },
             lgbm: {
-              n_estimators: { type: "int", min: 10, max: 5000, step: 10, default: 200 },
-              max_depth: { type: "int_or_none", min: 1, max: 128, step: 1, default: null },
-              learning_rate: { type: "float", min: 0.001, max: 1, step: 0.001, default: 0.1 },
-              num_leaves: { type: "int", min: 2, max: 1024, step: 1, default: 31 }
+              n_estimators: { type: "int", min: 10, max: 5000, step: 10, default: 200,
+                   desc: "(Boosting rounds, 10–5000)" },
+              max_depth: { type: "int_or_none", min: 1, max: 128, step: 1, default: null,
+                   desc: "(Tree depth, 1–128; blank=None)" },
+              learning_rate: { type: "float", min: 0.001, max: 1, default: 0.1,
+                   desc: "(Shrinkage, 0.001–1; typical 0.01–0.3)" },
+              num_leaves: { type: "int", min: 2, max: 1024, step: 1, default: 31,
+                   desc: "(Leaves per tree, 2–1024)" }
             },
             svm: {
-              C: { type: "float", min: 0.0001, max: 1000, step: 0.1, default: 1.0 }
+              C: { type: "float", min: 0.0001, max: 1000, default: 1.0,
+                   desc: "(Regularization, 0.0001–1000)" }
             },
             knn: {
-              n_neighbors: { type: "int", min: 1, max: 100, step: 1, default: 5 }
+              n_neighbors: { type: "int", min: 1, max: 100, step: 1, default: 5,
+                   desc: "(Neighbors, 1–100)" }
             }
           }
         };
@@ -289,26 +338,90 @@
           stratifyWrap.style.display = taskSelectV.value === "classification" ? "block" : "none";
         }
 
+        // helper to get current HP control value
+        function getHP(name) {
+          const el = document.getElementById("hp_" + name);
+          if (!el) return undefined;
+          if (el.type === "checkbox") return el.checked ? "true" : "false";
+          return el.value;
+        }
+
+        function setWarning(msg) {
+          if (msg) {
+            warningBox.textContent = "Incompatible hyperparameters: " + msg;
+            warningBox.style.display = "block";
+            trainBtn.disabled = true;
+          } else {
+            warningBox.textContent = "";
+            warningBox.style.display = "none";
+            trainBtn.disabled = false;
+          }
+        }
+
+        function validateCombos() {
+          setWarning("");
+          const task = taskSelectV.value;
+          const model = modelSelect.value;
+          if (task !== "classification" || model !== "logistic") return;
+
+          const penalty = (getHP("penalty") || "l2").toLowerCase();
+          const solver  = (getHP("solver") || "lbfgs").toLowerCase();
+          const l1r     = getHP("l1_ratio");
+          const cVal    = getHP("C");
+
+          const allowed = {
+            lbfgs: new Set(["l2"]),
+            liblinear: new Set(["l1","l2"]),
+            saga: new Set(["l1","l2","elasticnet"])
+          };
+
+          if (!allowed[solver]) {
+            return setWarning("solver='" + solver + "' is not supported. Use lbfgs, liblinear or saga.");
+          }
+          if (!allowed[solver].has(penalty)) {
+            return setWarning("penalty='" + penalty + "' is incompatible with solver='" + solver + "'.");
+          }
+          if (penalty === "elasticnet") {
+            if (solver !== "saga") {
+              return setWarning("elasticnet penalty requires solver='saga'.");
+            }
+            if (l1r === undefined || l1r === "" || isNaN(Number(l1r))) {
+              return setWarning("elasticnet requires l1_ratio (0–1).");
+            }
+            const r = Number(l1r);
+            if (r < 0 || r > 1) {
+              return setWarning("l1_ratio must be between 0 and 1.");
+            }
+          }
+          if (cVal !== undefined && cVal !== "" && !isNaN(Number(cVal))) {
+            if (Number(cVal) <= 0) {
+              return setWarning("C must be > 0.");
+            }
+          }
+          setWarning("");
+        }
+
         function renderModels() {
           const task = taskSelectV.value;
           const options = MODEL_OPTIONS[task] || [];
           modelSelect.innerHTML = "";
-          if (options.length === 0) {
-            const opt = document.createElement("option");
-            opt.value = ""; opt.disabled = true; opt.selected = true;
-            opt.textContent = "No models available";
-            modelSelect.appendChild(opt);
+
+          options.forEach(m => {
+            const o = document.createElement("option");
+            o.value = m.value; o.textContent = m.text;
+            modelSelect.appendChild(o);
+          });
+
+          // Prefill previously selected model (if any)
+          if (PRE_SELECTED_MODEL && options.some(x => x.value === PRE_SELECTED_MODEL)) {
+            modelSelect.value = PRE_SELECTED_MODEL;
           } else {
-            options.forEach(m => {
-              const o = document.createElement("option");
-              o.value = m.value; o.textContent = m.text;
-              modelSelect.appendChild(o);
-            });
             modelSelect.selectedIndex = 0;
           }
-          renderHyperparams();
         }
 
+        // Render HP fields and prefill from PRE_HP once at init
+        let didPrefillOnce = false;
         function renderHyperparams() {
           const task = taskSelectV.value;
           const model = modelSelect.value;
@@ -317,6 +430,7 @@
 
           if (!schema || Object.keys(schema).length === 0) {
             hpFields.innerHTML = '<p class="muted">No hyperparameters for this model.</p>';
+            validateCombos();
             return;
           }
 
@@ -331,6 +445,14 @@
             const label = document.createElement("label");
             label.setAttribute("for", fieldId);
             label.textContent = name;
+            if (spec.desc) {
+              const small = document.createElement("small");
+              small.style.display = "block";
+              small.style.color = "#666";
+              small.style.marginTop = "2px";
+              small.textContent = spec.desc;
+              label.appendChild(small);
+            }
 
             let input;
             if (spec.type === "choice") {
@@ -340,9 +462,9 @@
                 const opt = document.createElement("option");
                 opt.value = c === null ? "none" : c;
                 opt.textContent = c === null ? "None" : c;
-                if (c === spec.default) opt.selected = true;
                 input.appendChild(opt);
               });
+              input.value = spec.default;
             } else if (spec.type === "bool") {
               input = document.createElement("input");
               input.type = "checkbox"; input.name = fieldId; input.id = fieldId;
@@ -352,7 +474,7 @@
               input.type = "number"; input.name = fieldId; input.id = fieldId;
               if (spec.min !== undefined) input.min = spec.min;
               if (spec.max !== undefined) input.max = spec.max;
-              if (spec.step !== undefined) input.step = spec.step;
+              input.step = (spec.type === "float") ? "any" : (spec.step !== undefined ? spec.step : 1);
               if (spec.default === null || spec.default === undefined) {
                 input.placeholder = "None";
               } else {
@@ -366,36 +488,70 @@
           });
 
           hpFields.appendChild(grid);
+
+          // Prefill once with PRE_HP if it matches current model
+          if (!didPrefillOnce && PRE_HP && Object.keys(PRE_HP).length > 0) {
+            Object.entries(PRE_HP).forEach(([k, v]) => {
+              const el = document.getElementById("hp_" + k);
+              if (!el) return;
+              if (el.tagName.toLowerCase() === "select") {
+                el.value = String(v);
+              } else if (el.type === "checkbox") {
+                el.checked = Boolean(v);
+              } else {
+                el.value = v;
+              }
+            });
+            didPrefillOnce = true;
+          }
+
+          // re-validate on changes
+          hpFields.querySelectorAll("input,select").forEach(el => {
+            el.addEventListener("input", validateCombos);
+            el.addEventListener("change", validateCombos);
+          });
+
+          validateCombos();
         }
 
-        // Events
-        modelSelect.addEventListener("change", renderHyperparams);
-        taskSelectV.addEventListener("change", () => {
-          renderModels();
-          updateSplitVisibility();
-        });
-        splitMode.addEventListener("change", updateSplitVisibility);
-
-        // Locking (only after server returns locked=True)
         function setDisabled(disabled) {
-          [taskSelectV, targetSelect, modelSelect, splitMode,
-           document.getElementById("test-size"),
-           document.getElementById("val-size"),
-           document.getElementById("shuffle"),
-           document.getElementById("stratify"),
-           document.getElementById("random-state")].forEach(el => {
-             if (el) el.disabled = disabled;
-           });
+          [
+            taskSelectV,
+            document.getElementById("target_column-train"),
+            modelSelect,
+            splitMode,
+            document.getElementById("test-size"),
+            document.getElementById("val-size"),
+            document.getElementById("shuffle"),
+            document.getElementById("stratify"),
+            document.getElementById("random-state")
+          ].forEach(el => { if (el) el.disabled = disabled; });
           hpFields.querySelectorAll("input, select, textarea").forEach(el => el.disabled = disabled);
           changeBtn.style.display = disabled ? "inline-block" : "none";
         }
-        const isLocked = "{{ locked|default:False }}".toString() === "True";
-        if (isLocked) setDisabled(true);
-        changeBtn.addEventListener("click", () => setDisabled(false));
 
-        // initial
-        renderModels();
-        updateSplitVisibility();
+        function init() {
+          renderModels();
+
+          // If backend set a pre-selected model, keep it
+          if (PRE_SELECTED_MODEL) {
+            modelSelect.value = PRE_SELECTED_MODEL;
+          }
+
+          renderHyperparams();
+          updateSplitVisibility();
+
+          // Lock if the server says so
+          const isLocked = "{{ locked|default:False }}".toString() === "True";
+          if (isLocked) setDisabled(true);
+
+          changeBtn.addEventListener("click", () => setDisabled(false));
+          modelSelect.addEventListener("change", () => { didPrefillOnce = false; renderHyperparams(); });
+          taskSelectV.addEventListener("change", () => { renderModels(); didPrefillOnce = false; renderHyperparams(); updateSplitVisibility(); });
+          splitMode.addEventListener("change", updateSplitVisibility);
+        }
+
+        init();
       });
       </script>
     </section>
@@ -425,7 +581,8 @@
     </section>
   {% endif %}
 
-    <section>
+  <!-- Reset / Start over button at the very end -->
+  <section>
     <form method="post" class="form-block">
       {% csrf_token %}
       <button type="submit" name="reset" value="1" class="btn"
