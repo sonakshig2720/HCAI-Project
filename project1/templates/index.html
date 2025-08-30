@@ -12,14 +12,14 @@
 
   <h1>Project 1: Automated Machine Learning</h1>
 
-  <!-- Small description below title -->
   <p class="lead">
     This project provides an interactive interface for automated machine learning. 
     You can upload a dataset, explore it through visualizations, and train different ML models 
-    for both classification and regression tasks. The app guides you through the basic ML pipeline, 
-    from data exploration to model evaluation.
+    for both classification and regression tasks.
   </p>
 
+
+  <!-- 1) Upload -->
   <section>
     <h2>Upload CSV File</h2>
     <form method="post" enctype="multipart/form-data">
@@ -27,9 +27,16 @@
       <input type="file" name="csv_file" accept=".csv" required>
       <button type="submit">Upload</button>
     </form>
+    {% if message %}
+      <p class="status">{{ message }}</p>
+    {% endif %}
+    {% if error_msg %}
+      <p class="status error">{{ error_msg }}</p>
+    {% endif %}
   </section>
 
   {% if data_preview %}
+    <!-- 2) Preview -->
     <section>
       <h2>Dataset Preview</h2>
       <div class="data-preview-container">
@@ -67,13 +74,14 @@
   {% endif %}
 
   {% if show_visualize or show_train_form %}
+    <!-- 3) Visualize -->
     <hr>
     <section>
       <h2>Select Task and Target Column</h2>
       <form method="post">
         {% csrf_token %}
         <label for="target_column">Target Column:</label>
-        <select name="target_column" required>
+        <select name="target_column" id="target_column" required>
           {% for col in columns %}
             <option value="{{ col }}" {% if col == target_column %}selected{% endif %}>{{ col }}</option>
           {% endfor %}
@@ -86,21 +94,21 @@
         </select><br><br>
 
         <label for="x_feature">X Feature:</label>
-        <select name="x_feature" required>
+        <select name="x_feature" id="x_feature" required>
           {% for col in columns %}
             <option value="{{ col }}" {% if col == x_feature %}selected{% endif %}>{{ col }}</option>
           {% endfor %}
         </select><br><br>
 
         <label for="y_feature">Y Feature (optional for regression, required for classification):</label>
-        <select name="y_feature">
+        <select name="y_feature" id="y_feature">
           <option value="">-- Optional --</option>
           {% for col in columns %}
             <option value="{{ col }}" {% if col == y_feature %}selected{% endif %}>{{ col }}</option>
           {% endfor %}
         </select><br><br>
 
-        <button type="submit" name="visualize">Visualize</button>
+        <button type="submit" name="visualize" value="1">Visualize</button>
       </form>
     </section>
   {% endif %}
@@ -113,55 +121,282 @@
   {% endif %}
 
   {% if show_train_form %}
+    <!-- 4) Train -->
     <hr>
     <section>
       <h2>Train a Model</h2>
-      <form method="post">
+      <form id="train-form" method="post">
         {% csrf_token %}
-        <input type="hidden" name="target_column" value="{{ request.POST.target_column|default:'' }}">
 
-        <label for="task">Problem Type:</label>
-        <select name="task" id="task-select" required onchange="updateModels()">
-          <option value="classification">Classification</option>
-          <option value="regression">Regression</option>
+        <label for="task-train">Problem Type:</label>
+        <select name="task" id="task-train" required>
+          <option value="classification" {% if task == "classification" %}selected{% endif %}>Classification</option>
+          <option value="regression" {% if task == "regression" %}selected{% endif %}>Regression</option>
         </select><br><br>
 
-        <label for="model_type">Choose Model:</label>
-        <select name="model_type" id="model-select" required></select><br><br>
+        <label for="target_column-train">Target Column:</label>
+        <select name="target_column" id="target_column-train" required>
+          {% for col in columns %}
+            <option value="{{ col }}" {% if col == target_column %}selected{% endif %}>{{ col }}</option>
+          {% endfor %}
+        </select><br><br>
 
-        <button type="submit" name="train">Train Model</button>
+        <fieldset>
+          <legend>Split</legend>
+          <label for="split-mode">Mode:</label>
+          <select name="split_mode" id="split-mode">
+            <option value="tt" selected>Train / Test</option>
+            <option value="tvt">Train / Validation / Test</option>
+          </select><br><br>
+
+          <label for="test-size">Test size (0–1):</label>
+          <input id="test-size" name="test_size" type="number" min="0.05" max="0.95" step="0.01" value="0.2"><br><br>
+
+          <div id="val-size-wrap" style="display:none;">
+            <label for="val-size">Validation size (0–1):</label>
+            <input id="val-size" name="val_size" type="number" min="0.05" max="0.9" step="0.01" value="0.1"><br><br>
+          </div>
+
+          <label><input type="checkbox" name="shuffle" id="shuffle" checked> Shuffle</label><br><br>
+          <div id="stratify-wrap">
+            <label><input type="checkbox" name="stratify" id="stratify" checked> Stratify (classification only)</label><br><br>
+          </div>
+
+          <label for="random-state">Random state:</label>
+          <input id="random-state" name="random_state" type="number" step="1" placeholder="None"><br><br>
+        </fieldset>
+        <br>
+
+        <label for="model_type">Choose Model:</label>
+        <select name="model_type" id="model-select" required>
+          <option value="" disabled selected>Select a model</option>
+        </select><br><br>
+
+        <div id="hp-fields" class="hp-container">
+          <p class="muted">Pick a model to see its hyperparameters.</p>
+        </div>
+
+        <button type="submit" name="train" value="1" id="train-btn">Train Model</button>
+        <!-- Centered Change selection button (inline CSS) -->
+        <button type="button" id="change-btn" class="btn btn-secondary"
+                style="display:none; margin:12px auto 0; display:block; text-align:center;">
+          Change selection
+        </button>
       </form>
 
       <script>
-        const modelSelect = document.getElementById("model-select");
-        const taskSelect = document.getElementById("task-select");
-        const modelOptions = {
+      document.addEventListener("DOMContentLoaded", function() {
+        const modelSelect  = document.getElementById("model-select");
+        const taskSelectV  = document.getElementById("task-train");
+        const targetSelect = document.getElementById("target_column-train");
+        const hpFields     = document.getElementById("hp-fields");
+        const splitMode    = document.getElementById("split-mode");
+        const valWrap      = document.getElementById("val-size-wrap");
+        const stratifyWrap = document.getElementById("stratify-wrap");
+        const changeBtn    = document.getElementById("change-btn");
+
+        // Model options
+        const MODEL_OPTIONS = {
           classification: [
             { value: "logistic", text: "Logistic Regression" },
             { value: "dt", text: "Decision Tree" },
             { value: "rf", text: "Random Forest" },
             { value: "knn", text: "K-Nearest Neighbors" },
-            { value: "svm", text: "Support Vector Machine" },
+            { value: "svm", text: "Support Vector Machine (SVC)" },
             { value: "nb", text: "Naive Bayes" }
           ],
           regression: [
             { value: "lasso", text: "Lasso Regression" },
             { value: "ridge", text: "Ridge Regression" },
+            { value: "rf", text: "Random Forest Regressor" },
             { value: "xgb", text: "XGBoost Regressor" },
-            { value: "lgbm", text: "LightGBM Regressor" }
+            { value: "lgbm", text: "LightGBM Regressor" },
+            { value: "svm", text: "Support Vector Regressor" },
+            { value: "knn", text: "KNN Regressor" }
           ]
         };
-        function updateModels() {
-          const task = taskSelect.value;
-          modelSelect.innerHTML = "";
-          modelOptions[task].forEach(model => {
-            const option = document.createElement("option");
-            option.value = model.value;
-            option.text = model.text;
-            modelSelect.appendChild(option);
-          });
+
+        const HP_SCHEMA = {
+          classification: {
+            logistic: {
+              C: { type: "float", min: 0.0001, max: 1000, step: 0.1, default: 1.0 },
+              penalty: { type: "choice", choices: ["l2", "l1", "elasticnet"], default: "l2" },
+              solver: { type: "choice", choices: ["lbfgs","liblinear","saga"], default: "lbfgs" },
+              max_iter: { type: "int", min: 50, max: 5000, step: 50, default: 200 }
+            },
+            dt: {
+              criterion: { type: "choice", choices: ["gini","entropy","log_loss"], default: "gini" },
+              max_depth: { type: "int_or_none", min: 1, max: 200, step: 1, default: null },
+              min_samples_split: { type: "int", min: 2, max: 50, step: 1, default: 2 },
+              min_samples_leaf: { type: "int", min: 1, max: 50, step: 1, default: 1 }
+            },
+            rf: {
+              n_estimators: { type: "int", min: 10, max: 2000, step: 10, default: 100 },
+              max_depth: { type: "int_or_none", min: 1, max: 200, step: 1, default: null },
+              min_samples_split: { type: "int", min: 2, max: 50, step: 1, default: 2 },
+              min_samples_leaf: { type: "int", min: 1, max: 50, step: 1, default: 1 }
+            },
+            knn: {
+              n_neighbors: { type: "int", min: 1, max: 100, step: 1, default: 5 },
+              weights: { type: "choice", choices: ["uniform","distance"], default: "uniform" }
+            },
+            svm: {
+              C: { type: "float", min: 0.0001, max: 1000, step: 0.1, default: 1.0 },
+              kernel: { type: "choice", choices: ["rbf","linear","poly","sigmoid"], default: "rbf" },
+              gamma: { type: "choice", choices: ["scale","auto"], default: "scale" }
+            },
+            nb: {}
+          },
+          regression: {
+            lasso: {
+              alpha: { type: "float", min: 0.0, max: 10, step: 0.001, default: 1.0 },
+              max_iter: { type: "int", min: 50, max: 20000, step: 50, default: 1000 }
+            },
+            ridge: {
+              alpha: { type: "float", min: 0.0, max: 10, step: 0.001, default: 1.0 },
+              solver: { type: "choice", choices: ["auto","svd","cholesky","lsqr","sparse_cg","sag","saga"], default: "auto" }
+            },
+            rf: {
+              n_estimators: { type: "int", min: 10, max: 2000, step: 10, default: 100 },
+              max_depth: { type: "int_or_none", min: 1, max: 200, step: 1, default: null },
+              min_samples_split: { type: "int", min: 2, max: 50, step: 1, default: 2 },
+              min_samples_leaf: { type: "int", min: 1, max: 50, step: 1, default: 1 }
+            },
+            xgb: {
+              n_estimators: { type: "int", min: 10, max: 5000, step: 10, default: 200 },
+              max_depth: { type: "int", min: 1, max: 20, step: 1, default: 6 },
+              learning_rate: { type: "float", min: 0.001, max: 1, step: 0.001, default: 0.1 },
+              subsample: { type: "float", min: 0.1, max: 1, step: 0.01, default: 1.0 },
+              colsample_bytree: { type: "float", min: 0.1, max: 1, step: 0.01, default: 1.0 }
+            },
+            lgbm: {
+              n_estimators: { type: "int", min: 10, max: 5000, step: 10, default: 200 },
+              max_depth: { type: "int_or_none", min: 1, max: 128, step: 1, default: null },
+              learning_rate: { type: "float", min: 0.001, max: 1, step: 0.001, default: 0.1 },
+              num_leaves: { type: "int", min: 2, max: 1024, step: 1, default: 31 }
+            },
+            svm: {
+              C: { type: "float", min: 0.0001, max: 1000, step: 0.1, default: 1.0 }
+            },
+            knn: {
+              n_neighbors: { type: "int", min: 1, max: 100, step: 1, default: 5 }
+            }
+          }
+        };
+
+        function updateSplitVisibility() {
+          valWrap.style.display = splitMode.value === "tvt" ? "block" : "none";
+          stratifyWrap.style.display = taskSelectV.value === "classification" ? "block" : "none";
         }
-        updateModels();
+
+        function renderModels() {
+          const task = taskSelectV.value;
+          const options = MODEL_OPTIONS[task] || [];
+          modelSelect.innerHTML = "";
+          if (options.length === 0) {
+            const opt = document.createElement("option");
+            opt.value = ""; opt.disabled = true; opt.selected = true;
+            opt.textContent = "No models available";
+            modelSelect.appendChild(opt);
+          } else {
+            options.forEach(m => {
+              const o = document.createElement("option");
+              o.value = m.value; o.textContent = m.text;
+              modelSelect.appendChild(o);
+            });
+            modelSelect.selectedIndex = 0;
+          }
+          renderHyperparams();
+        }
+
+        function renderHyperparams() {
+          const task = taskSelectV.value;
+          const model = modelSelect.value;
+          const schema = (HP_SCHEMA[task] && HP_SCHEMA[task][model]) ? HP_SCHEMA[task][model] : {};
+          hpFields.innerHTML = "";
+
+          if (!schema || Object.keys(schema).length === 0) {
+            hpFields.innerHTML = '<p class="muted">No hyperparameters for this model.</p>';
+            return;
+          }
+
+          const grid = document.createElement("div");
+          grid.className = "hp-grid";
+
+          Object.entries(schema).forEach(([name, spec]) => {
+            const fieldId = `hp_${name}`;
+            const wrap = document.createElement("div");
+            wrap.className = "hp-item";
+
+            const label = document.createElement("label");
+            label.setAttribute("for", fieldId);
+            label.textContent = name;
+
+            let input;
+            if (spec.type === "choice") {
+              input = document.createElement("select");
+              input.name = fieldId; input.id = fieldId;
+              (spec.choices || []).forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c === null ? "none" : c;
+                opt.textContent = c === null ? "None" : c;
+                if (c === spec.default) opt.selected = true;
+                input.appendChild(opt);
+              });
+            } else if (spec.type === "bool") {
+              input = document.createElement("input");
+              input.type = "checkbox"; input.name = fieldId; input.id = fieldId;
+              if (spec.default === true) input.checked = true;
+            } else {
+              input = document.createElement("input");
+              input.type = "number"; input.name = fieldId; input.id = fieldId;
+              if (spec.min !== undefined) input.min = spec.min;
+              if (spec.max !== undefined) input.max = spec.max;
+              if (spec.step !== undefined) input.step = spec.step;
+              if (spec.default === null || spec.default === undefined) {
+                input.placeholder = "None";
+              } else {
+                input.value = spec.default;
+              }
+            }
+
+            wrap.appendChild(label);
+            wrap.appendChild(input);
+            grid.appendChild(wrap);
+          });
+
+          hpFields.appendChild(grid);
+        }
+
+        // Events
+        modelSelect.addEventListener("change", renderHyperparams);
+        taskSelectV.addEventListener("change", () => {
+          renderModels();
+          updateSplitVisibility();
+        });
+        splitMode.addEventListener("change", updateSplitVisibility);
+
+        // Locking (only after server returns locked=True)
+        function setDisabled(disabled) {
+          [taskSelectV, targetSelect, modelSelect, splitMode,
+           document.getElementById("test-size"),
+           document.getElementById("val-size"),
+           document.getElementById("shuffle"),
+           document.getElementById("stratify"),
+           document.getElementById("random-state")].forEach(el => {
+             if (el) el.disabled = disabled;
+           });
+          hpFields.querySelectorAll("input, select, textarea").forEach(el => el.disabled = disabled);
+          changeBtn.style.display = disabled ? "inline-block" : "none";
+        }
+        const isLocked = "{{ locked|default:False }}".toString() === "True";
+        if (isLocked) setDisabled(true);
+        changeBtn.addEventListener("click", () => setDisabled(false));
+
+        // initial
+        renderModels();
+        updateSplitVisibility();
+      });
       </script>
     </section>
   {% endif %}
@@ -189,6 +424,16 @@
       {% endif %}
     </section>
   {% endif %}
+
+    <section>
+    <form method="post" class="form-block">
+      {% csrf_token %}
+      <button type="submit" name="reset" value="1" class="btn"
+              style="background:#fff3cd; border-color:#ffe69c; color:#000;">
+        Reset Session
+      </button>
+    </form>
+  </section>
 
 </div>
 {% endblock %}
